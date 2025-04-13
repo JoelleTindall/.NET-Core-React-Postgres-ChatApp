@@ -1,0 +1,212 @@
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+div .wrapper {
+    border: 4px solid black;
+    display: grid;
+    grid-template-columns: 1fr;
+    /*    grid-template-rows:2fr 1fr;*/
+    width: fit-content;
+    min-width: 75%;
+    margin: 0 auto;
+    border-radius: 30px;
+    /*    max-height:600px;*/
+}
+
+div .chatview {
+    /*    overflow-y:auto;*/
+    display: grid;
+    border: 1px dotted black;
+    /*margin:0;*/
+    /*    max-width: 100%;*/
+    height: 100%;
+    overflow-y: scroll;
+    background-color: #F9F9E0;
+    max-height: 500px;
+    width: inherit;
+    min-width: 90%;
+    padding: 10px;
+    margin: 5% 5% 1% 5%;
+}
+
+div .other-chat {
+    display: grid;
+    grid-template-columns: 8% 10% 62% 20%;
+    grid-template-rows: auto;
+    margin-left: 5px;
+    margin-top: 25px;
+    max-width: 100%;
+}
+
+
+div .chat .avatar {
+    background-color: rgb(128, 128, 128, .25);
+    border-radius: 10px 10px;
+}
+
+    div .chat .avatar img {
+    }
+
+div .other-chat .avatar {
+    grid-row: 1 / span 2;
+    /*    background-color: #8ACDD7;*/
+    /*    border-radius: 5px 0px 0px 5px;*/
+    /*    border: 1px solid black;
+    text-align: center;*/
+    max-height: fit-content;
+}
+
+div .chat .avatar img {
+    margin: 0 auto;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+div .other-chat .username {
+    width: 100%;
+    background-color: #8ACDD7;
+    border-radius: 0 5px 0 0;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 5px;
+}
+
+
+
+div .other-chat .date {
+    padding-left: 10px;
+    grid-column: 3;
+    font-style: italic;
+    opacity: 0.75;
+}
+
+div .other-chat .message {
+    grid-column: span 2;
+}
+
+    div .other-chat .message p {
+        background-color: #8ACDD7;
+        padding: 10px;
+        margin: 0;
+        /*    border:1px solid black;*/
+        min-width: 50%;
+        width: fit-content;
+        height: 100%;
+        border-radius: 0 10px 10px 0;
+        word-break: break-word;
+    }
+
+div .other-chat .spacer {
+    grid-column: 4;
+    grid-row: 1/ span 2;
+}
+
+
+
+
+
+div .self-chat {
+    display: grid;
+    grid-template-columns: 20% 62% 10% 8%;
+    grid-template-rows: auto;
+    margin-left: 5px;
+    margin-top: 25px;
+    max-width: 100%;
+    /*    border:1px solid black;*/
+}
+
+
+    div .self-chat .username {
+        width: 100%;
+        background-color: #8ACDD7;
+        border-radius: 5px 5px 0 0;
+        font-weight: bold;
+        text-align: center;
+        padding-top: 5px;
+        grid-column: 3;
+    }
+
+    div .self-chat .avatar {
+        grid-row: 1 / span 2;
+        grid-column: 4;
+        border-radius: 0 5px 5px 0;
+        max-height: fit-content;
+    }
+
+    div .self-chat .date {
+        padding-right: 10px;
+        grid-column: 2;
+        grid-row: 1;
+        font-style: italic;
+        opacity: 0.75;
+        text-align: right;
+    }
+
+    div .self-chat .message {
+        grid-column: 2/ span 2;
+        grid-row: 2;
+        text-align: right;
+    }
+
+        div .self-chat .message p {
+            background-color: #8ACDD7;
+            padding: 10px;
+            margin: 0;
+            /*    border:1px solid black;*/
+            min-width: 50%;
+            width: fit-content;
+            height: 100%;
+            border-radius: 10px 0 10px 10px;
+            word-break: break-word;
+            float: inline-end;
+        }
+
+    div .self-chat .spacer {
+        grid-column: 1;
+        grid-row: 1/ span 2;
+    }
+
+div .newmessage {
+    width: inherit;
+}
+
+.chatInput {
+    max-height: fit-content;
+    margin: 0 0 10% 0;
+}
+
+    .chatInput .message-textarea {
+        width: 90%; /* Make textarea expand to full width of its container */
+        resize: none; /* Allow resizing both horizontally and vertically */
+        min-height: 100px; /* Ensure there's a minimum height */
+        max-height: 400px; /* Optional: limit the maximum height */
+        box-sizing: border-box; /* Include padding/border in width calculation */
+        margin: 0 5% 5% 5%;
+    }
+
+    .chatInput .message-submit {
+        margin: 0 auto;
+        display: block;
+        width: 50%;
+    }
