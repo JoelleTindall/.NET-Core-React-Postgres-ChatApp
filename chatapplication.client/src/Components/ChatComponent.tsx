@@ -1,5 +1,6 @@
 // src/components/ChatComponent.tsx
 import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import '../assets/styles/ChatStyle.css';
 // Type definitions that match your .NET models
 interface Avatar {
@@ -18,15 +19,17 @@ interface Chat {
     message: string;
     createdAt: string;
     user: User;
+
 }
 
 const ChatComponent: React.FC = () => {
     const [chats, setChats] = useState<Chat[]>([]);
+    const [newMessage, setNewMessage] = useState<string>('');
 
     useEffect(() => {
         const fetchChats = async () => {
             try {
-                const response = await fetch('/chat'); // Adjust if your API base URL is different
+                const response = await fetch('/chat');
                 if (!response.ok) throw new Error('Failed to fetch chats');
 
                 const data: Chat[] = await response.json();
@@ -39,27 +42,31 @@ const ChatComponent: React.FC = () => {
         fetchChats();
     }, []);
 
-                //    <div class="username">@item.UserName</div>
-                //<div class="date">@item.CreatedAt.ToString("MM/dd/yyyy HH:mm")</div>
-                //<div class="message">
-                //    <p class="messagetext">@item.Message</p>
-    //</div>
-    //<strong>{chat.user?.userName}</strong>: { chat.message }
+    const handleSendMessage = async () => {
+        if (!newMessage.trim()) return;
+
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ message: newMessage })
+            });
+
+            if (!response.ok) throw new Error('Failed to send message');
+
+            const newChat: Chat = await response.json();
+
+            setChats((prevChats) => [...prevChats, newChat]);
+            setNewMessage('');
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    };
 
 
-
-    //<table key={chat.id}>
-
-    //    <tr>
-    //        <td>{chat.user.avatar?.filePath}</td>
-    //        <td>{chat.user?.userName}</td>
-    //        <td>{chat.createdAt}</td>
-    //    </tr>
-    //    <tr>
-    //        <td>{chat.message}</td>
-    //    </tr>
-
-    //</table>
     return (
         <div className="wrapper">
             <h2>Chat Messages</h2>
@@ -69,17 +76,53 @@ const ChatComponent: React.FC = () => {
                 {chats.map(chat => (
 
 
-                    <div key={chat.id}>
-
+                    <table className="chatmessage" key={chat.id}>
+                    <tbody>
+                        <tr>
+                            <td className="avatar"><img src={`/${chat.user.avatar?.filePath}`} alt="avatar"></img></td>
+                            <td>
+                                    <table>
+                                <tbody>
+                                <tr>
+                                    <td><div className="username">{chat.user?.userName}</div></td>
+                                        <td>
+                                            <div className="date">
+                                                {format(new Date(chat.createdAt), 'MM/dd/yyyy HH:mm')}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colSpan={2}>
+                                            <div className="message" ><p className="messagetext">{chat.message}</p></div>
+                                        </td>
+                                            </tr>
+                                        </tbody>
+                                </table>
+                            </td>
+                        </tr>
                         
-                            <div className="avatar">{chat.user.avatar?.filePath}</div>
-                            <div className="username">{chat.user?.userName}</div>
-                            <div className="date">{chat.createdAt}</div>
-                        <div className="message"><p className="messagetext">{chat.message}</p></div>
-                        
-                       
-                    </div>
+         
+                        </tbody>
+                    </table>
                 ))}
+                
+            </div>
+            <div className="chat-input-container">
+           
+                <textarea
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSendMessage();
+                    }}
+                    className="chat-input"
+                    />
+                
+              
+                <button onClick={handleSendMessage} className="send-button">
+                    Send
+                    </button>
                 
             </div>
         </div>

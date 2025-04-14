@@ -7,6 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApplication.Server.Controllers
 {
+
+    public class NewChatDto
+    {
+        public string Message { get; set; }
+    }
+
     [ApiController]
     [Route("chat")]
     public class ChatController : ControllerBase
@@ -41,19 +47,35 @@ namespace ChatApplication.Server.Controllers
 
             return Ok(chats);
         }
-        //public async Task OnGetAsync()
-        //{
-        //    CurrentUser = _userManager.GetUserId(User);  // Get the current user ID
+        [HttpPost]
+        public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDto incomingChat)
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = await _context.Users
+                .Include(u => u.Avatar)
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
-        //    // Get the list of chat messages from the database
-        //    Chats = await _context.Chats
-        //        .Include(c => c.User)  // Include the User object (User and Avatar are linked)
-        //        .ThenInclude(u => u.Avatar)  // Include the Avatar object
-        //        .OrderBy(c => c.CreatedAt)  // Order by creation date
-        //        .ToListAsync();
+            if (user == null) return Unauthorized();
 
+            var newChat = new Chat
+            {
+                Message = incomingChat.Message,
+                CreatedAt = DateTime.UtcNow,
+                User = user,
+                UserName = user.UserName
+            };
 
-        //}
+            _context.Chats.Add(newChat);
+            await _context.SaveChangesAsync();
+
+            var result = await _context.Chats
+                .Include(c => c.User)
+                .ThenInclude(u => u.Avatar)
+                .FirstOrDefaultAsync(c => c.Id == newChat.Id);
+
+            return Ok(result);
+        }
+
 
 
     }
