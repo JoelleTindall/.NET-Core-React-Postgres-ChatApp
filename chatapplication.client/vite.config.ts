@@ -55,6 +55,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/avatar': {
+                target,
+                secure: false
+            },
             '^/pingauth': {
                 target,
                 secure: false

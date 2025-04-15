@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.7.3",
+    "hamburger-react": "^2.5.2",
+    "react-use": "^17.6.0"
   }
 }
