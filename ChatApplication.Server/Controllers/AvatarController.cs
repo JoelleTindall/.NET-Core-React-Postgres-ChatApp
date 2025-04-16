@@ -36,6 +36,20 @@ namespace ChatApplication.Server.Controllers
             return Ok(avatars);
         }
 
+        [HttpPost("set")]
+        public async Task<IActionResult> SetAvatar([FromBody] int avatarId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var avatar = await _context.Avatars.FindAsync(avatarId);
+            if (avatar == null) return NotFound("Avatar not found");
+
+            user.AvatarId = avatar.Id;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { success = true });
+        }
 
         //// POST api/<AvatarContoller>
         //[HttpPost]

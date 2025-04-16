@@ -74,9 +74,15 @@ export default defineConfig({
             '^/logout': {
                 target,
                 secure: false
+            },
+            '^/chathub': {
+                target,
+                ws: true,
+                secure: false
             }
         },
-        port: parseInt(env.DEV_SERVER_PORT || '59995'),
+        port: 59996,  // Ensure Vite always uses port 59996
+        strictPort: true,
         https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),

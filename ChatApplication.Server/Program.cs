@@ -13,14 +13,18 @@ using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromMinutes(1); // Configure as per your need
+    options.ClientTimeoutInterval = TimeSpan.FromMinutes(2); // Set a timeout interval
+});
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:59995") // Your React app's origin
+            policy.WithOrigins("http://localhost:59996") // Your React app's origin
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials(); // Required if using cookies or authorization
@@ -59,8 +63,9 @@ app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
 
 app.MapGet("/pingauth", (ClaimsPrincipal user) =>
 {
-    var email = user.FindFirstValue(ClaimTypes.Email); // get the user's email from the claim
-    return Results.Json(new { Email = email }); ; // return the email as a plain text response
+    var email = user.FindFirstValue(ClaimTypes.Email);
+    var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    return Results.Json(new { Email = email, Id = id });
 }).RequireAuthorization();
 
 
@@ -77,7 +82,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<ChatHub>("/ChatHub");
+app.MapHub<ChatHub>("/chathub");
 
 app.MapFallbackToFile("/index.html");
 

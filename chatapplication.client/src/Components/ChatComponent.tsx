@@ -1,11 +1,12 @@
-// src/components/ChatComponent.tsx
 import React, { useEffect, useState, useRef } from 'react';
+import { HubConnectionBuilder, HubConnection, HttpTransportType } from '@microsoft/signalr';
 import { format } from 'date-fns';
 import { useClickAway } from 'react-use';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Rotate as Hamburger } from 'hamburger-react';
 import LogoutLink from './LogoutLink';
 import { AuthorizedUser } from './AuthorizeView';
+import AvatarPicker from './AvatarPicker';
 import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
 
@@ -26,106 +27,155 @@ interface Chat {
     message: string;
     createdAt: string;
     user: User;
-
 }
 
 const ChatComponent: React.FC = () => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    //const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [isOpen, setOpen] = useState(false);
+    const [connection, setConnection] = useState<HubConnection | null>(null);
     const [isEditOpen, setEditOpen] = useState(false);
+
     const ref = useRef(null);
+    const scrollRef = useRef<HTMLDivElement>(null);  // references the bottom of the chat container
+    const isFirstLoad = useRef(true);  
+    const isConnected = useRef(false);  // track whether SignalR is already connected
+    const isInitialized = useRef(false); // To avoid effect running multiple times
 
     useClickAway(ref, () => setOpen(false));
 
-    //const [isOpen, setOpen] = useState(false)
-
-    useEffect(() => {
-        const fetchChats = async () => {
-            try {
-                const response = await fetch('/chat');
-                if (!response.ok) throw new Error('Failed to fetch chats');
-
-                const data: Chat[] = await response.json();
-                setChats(data);
-            } catch (error) {
-                console.error('Error fetching chat messages:', error);
-            }
-        };
-
-        fetchChats();
-
-        const fetchCurrentUser = async () => {
-            try {
-                const res = await fetch('/pingauth', { credentials: 'include' });
-                if (res.ok) {
-                    const user = await res.json();
-                    setCurrentUserId(user.email); // id is returned from updated pingauth endpoint
-                }
-            } catch (err) {
-                console.error('Failed to get current user:', err);
-            }
-        };
-
-        fetchCurrentUser();
-
-            
-    }, []);
-
-    const handleSendMessage = async () => {
-        if (!newMessage.trim()) return;
-
+    // Fetch chat messages
+    const fetchChats = async () => {
         try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ message: newMessage })
-            });
-
-            if (!response.ok) throw new Error('Failed to send message');
-
-            const newChat: Chat = await response.json();
-
-            setChats((prevChats) => [...prevChats, newChat]);
-            setNewMessage('');
+            const response = await fetch('/chat');
+            if (!response.ok) throw new Error('Failed to fetch chats');
+            const data: Chat[] = await response.json();
+            setChats(data);
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error fetching chat messages:', error);
         }
     };
 
-    
+    // Fetch current user
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await fetch('/pingauth', { credentials: 'include' });
+            if (res.ok) {
+                const user = await res.json();
+                setCurrentUserId(user.id); // id is returned from updated pingauth endpoint
+            }
+        } catch (err) {
+            console.error('Failed to get current user:', err);
+        }
+    };
 
+    // set up signalr connection
+    const connectSignalR = async () => {
+        // Prevent connection if already connected
+        if (isConnected.current) return;
+
+        const hubConnection = new HubConnectionBuilder()
+            .withUrl('/chathub', {
+                transport: HttpTransportType.WebSockets,
+                skipNegotiation: true
+            })
+            .withAutomaticReconnect()
+            .build();
+
+        // Remove any existing listeners before adding new ones
+        hubConnection.off("ReceiveMessage");
+
+        // Add handler for receiving messages
+        hubConnection.on("ReceiveMessage", (userId, userName, message, avatarUrl, createdAt) => {
+            const newChat = {
+                id: crypto.randomUUID(),
+                message,
+                createdAt,
+                user: {
+                    id: userId,
+                    userName,
+                    avatar: { id: '', filePath: avatarUrl }
+                }
+            };
+
+            setChats(prevChats => [...prevChats, newChat]);
+        });
+
+        // Start the connection
+        await hubConnection.start();
+        setConnection(hubConnection);
+        isConnected.current = true;  // Mark as connected
+        console.log("Connected to SignalR hub!");
+    };
+
+    // Effect to fetch chats and user on mount
+    useEffect(() => {
+        if (isInitialized.current) return;
+        isInitialized.current = true;
+
+        fetchChats();
+        fetchCurrentUser();
+        connectSignalR();
+
+        return () => {
+            // Cleanup signalr connection on unmount
+            if (connection) {
+                connection.stop();
+                isConnected.current = false;  // Reset connection flag
+                console.log("Disconnected from SignalR hub.");
+            }
+        };
+    }, []); // Empty dependency array ensures effect runs only once
+
+    // Scroll to bottom function
+    const scrollToBottom = () => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    // Auto scroll when first loaded and when new message arrives
+    useEffect(() => {
+        if (isFirstLoad.current) {
+            // On load, scroll to bottom
+            scrollToBottom();
+            isFirstLoad.current = false; // After load, stop auto-scrolling
+        }
+    }, [chats]); //  run when chats changes
+
+    useEffect(() => {
+        // scroll to bottom when a new message is added
+        if (!isFirstLoad.current && !isOpen) {
+            scrollToBottom();
+        }
+    }, [chats,isOpen]);  // trigger scroll on every chat update
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim() || !connection || !currentUserId) return;
+        try {
+            await connection.invoke("SendMessage", currentUserId, newMessage);
+            setNewMessage('');
+        } catch (err) {
+            console.error("Error sending message through SignalR:", err);
+        }
+    };
 
     return (
-        
         <div className="wrapper third-color">
-
-
-
             <ul className="chat-header">
-
                 <li className="a"><h2>Chat It Up!</h2></li>
-
                 <li></li>
                 <li className="b">
-                    <div className="hamburger-btn" ><Hamburger toggled={isOpen} toggle={setOpen}/></div> 
-
+                    <div className="hamburger-btn" ><Hamburger toggled={isOpen} toggle={setOpen} /></div>
                 </li>
+            </ul>
 
-            </ul> 
-         
-            {isOpen && (<div className="menu-wrapper" >
-
-                <AnimatePresence>
-               
+            {isOpen && (
+                <div className="menu-wrapper">
+                    <AnimatePresence>
                         <motion.div
-                        className="menu-overlay"
-
+                            className="menu-overlay"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
@@ -133,7 +183,7 @@ const ChatComponent: React.FC = () => {
                         >
                             <ul className="menu-list">
                                 <li><p>Edit User</p></li>
-                                <li><p>Other Option</p></li>
+                                <li><AvatarPicker /></li>
                                 <li>
                                     <LogoutLink>
                                         Logout (<AuthorizedUser value="email" />)
@@ -141,17 +191,13 @@ const ChatComponent: React.FC = () => {
                                 </li>
                             </ul>
                         </motion.div>
-                   
-                </AnimatePresence>
-            </div>)}
-     
+                    </AnimatePresence>
+                </div>
+            )}
 
-            
             <div className="chatview second-color" id="ChatView">
-
-            
                 {chats.map(chat => {
-                    const isCurrentUser = chat.user.userName === currentUserId;
+                    const isCurrentUser = chat.user.id === currentUserId;
                     return (
                         <div
                             className={`chatmessage ${isCurrentUser ? 'own-message' : ''}`}
@@ -180,10 +226,10 @@ const ChatComponent: React.FC = () => {
                         </div>
                     );
                 })}
-                
+                <div ref={scrollRef}></div> {/* This is the anchor element for scrolling */}
             </div>
+
             <div className="chat-input-container">
-           
                 <textarea
                     placeholder="Type your message..."
                     value={newMessage}
@@ -192,13 +238,11 @@ const ChatComponent: React.FC = () => {
                         if (e.key === 'Enter') handleSendMessage();
                     }}
                     className="chat-input"
-                    />
-                
-              
+                />
+
                 <button onClick={handleSendMessage} className="send-button fourth-color">
                     Send
-                    </button>
-                
+                </button>
             </div>
         </div>
     );
