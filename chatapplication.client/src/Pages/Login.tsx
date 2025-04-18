@@ -39,7 +39,7 @@ function Login() {
             //else
             //    loginurl = "/login?useSessionCookies=true";
 
-            fetch('account/login', {
+            fetch('/api/account/login', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

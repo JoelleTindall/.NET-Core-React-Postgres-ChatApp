@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ChatApplication.Server.Controllers
 {
     [ApiController]
-    [Route("account")]
+    [Route("api/account")]
     public class UserController : ControllerBase
     {
         private readonly ChatAppContext _context;

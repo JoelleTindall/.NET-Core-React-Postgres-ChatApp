@@ -15,7 +15,7 @@ namespace ChatApplication.Server.Controllers
     }
 
     [ApiController]
-    [Route("chat")]
+    [Route("api/chat")]
     public class ChatController : ControllerBase
     {
         private readonly ChatAppContext _context;

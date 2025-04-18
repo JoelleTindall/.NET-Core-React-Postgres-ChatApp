@@ -10,7 +10,7 @@ namespace ChatApplication.Server.Controllers
 {
     
     [ApiController]
-    [Route("avatar")]
+    [Route("api/avatar")]
     public class AvatarController : ControllerBase
     {
         private readonly ChatAppContext _context;

@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5000") // Your React app's origin
+            policy.WithOrigins("http://localhost:3000") // Your React app's origin
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials(); // Required if using cookies or authorization
@@ -44,8 +44,8 @@ builder.Services.AddDbContext<ChatAppContext>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "account/login";
-        options.LogoutPath = "account/logout";
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax; 
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use Secure in production
@@ -58,6 +58,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
