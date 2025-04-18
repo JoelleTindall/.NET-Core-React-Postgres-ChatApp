@@ -44,8 +44,8 @@ builder.Services.AddDbContext<ChatAppContext>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/api/auth/login";
-        options.LogoutPath = "/api/auth/logout";
+        options.LoginPath = "account/login";
+        options.LogoutPath = "account/logout";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax; 
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use Secure in production
