@@ -1,7 +1,8 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 using ChatApplication.Server.Data;
 using ChatApplication.Server.Models;
-using Microsoft.AspNetCore.Identity;
+//using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,13 +19,13 @@ namespace ChatApplication.Server.Controllers
     public class ChatController : ControllerBase
     {
         private readonly ChatAppContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public ChatController(ChatAppContext context, UserManager<ApplicationUser> userManager)
+        public ChatController(ChatAppContext context)
         {
             _context = context;
-            _userManager = userManager;
+          //  _userManager = userManager;
         }
 
         // List to hold chat messages
@@ -37,7 +38,7 @@ namespace ChatApplication.Server.Controllers
         [HttpGet(Name = "GetChats")]
         public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
         {
-            var currentUserId = _userManager.GetUserId(User);  // Optional, in case you need to use it
+          //  var currentUserId = _userManager.GetUserId(User);  // Optional, in case you need to use it
 
             var chats = await _context.Chats
                 .Include(c => c.User)
@@ -50,7 +51,10 @@ namespace ChatApplication.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDto incomingChat)
         {
-            var userId = _userManager.GetUserId(User);
+           // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user_Id= User.FindFirstValue(ClaimTypes.NameIdentifier);
+           int userId=Int32.Parse(user_Id);
+            //  var userId = _userManager.GetUserId(User);
             var user = await _context.Users
                 .Include(u => u.Avatar)
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -61,8 +65,7 @@ namespace ChatApplication.Server.Controllers
             {
                 Message = incomingChat.Message,
                 CreatedAt = DateTime.UtcNow,
-                User = user,
-                UserName = user.UserName
+                User = user
             };
 
             _context.Chats.Add(newChat);
@@ -74,6 +77,7 @@ namespace ChatApplication.Server.Controllers
                 .FirstOrDefaultAsync(c => c.Id == newChat.Id);
 
             return Ok(result);
+
         }
 
 

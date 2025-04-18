@@ -1,12 +1,12 @@
 ﻿using System.Reflection.Emit;
 using ChatApplication.Server.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+//using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace ChatApplication.Server.Data
 {
-    public class ChatAppContext : IdentityDbContext<ApplicationUser>  // Use ApplicationUser here
+    public class ChatAppContext : DbContext  
     {
 
         public ChatAppContext(DbContextOptions<ChatAppContext> options)
@@ -16,6 +16,7 @@ namespace ChatApplication.Server.Data
 
         public DbSet<Chat> Chats { get; set; } = default!;
         public DbSet<Avatar> Avatars { get; set; } = default!;
+        public DbSet<User> Users { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -27,15 +28,14 @@ namespace ChatApplication.Server.Data
             new Avatar { Id = 3, FilePath = "img/mad.png" }
 
 );
-            builder.Entity<Chat>().HasData(
-                new Chat { Id =1, 
-                    UserId = "8da2ec45-a26a-4643-ac5c-b0514f2eb803",
-                UserName="Test",
-                Message="This is a test message",
-                CreatedAt= DateTime.UtcNow}
-                );
+            builder.Entity<Chat>()
+                .HasOne(c => c.User) // A chat has one user
+                .WithMany() // A user can have many chats
+                .HasForeignKey(c => c.UserId) // Foreign key to Users table
+                .IsRequired(false); // Make it optional if needed
+               
             // Define the relationship between ApplicationUser and Avatar
-            builder.Entity<ApplicationUser>()
+            builder.Entity<User>()
                 .HasOne(u => u.Avatar)  // A user has one avatar
                 .WithMany()              // One avatar can be used by multiple users
                 .HasForeignKey(u => u.AvatarId) // Foreign key to Avatar table

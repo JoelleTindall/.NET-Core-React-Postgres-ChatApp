@@ -15,7 +15,7 @@ namespace ChatApplication.Server.Hubs
         }
 
         // This method sends a message and includes the user's avatar URL
-        public async Task SendMessage(string userId, string message)
+        public async Task SendMessage(int userId, string message)
         {
             // Get the user associated with the userId from the database
             var user = await _context.Users
@@ -34,7 +34,6 @@ namespace ChatApplication.Server.Hubs
             var chatMessage = new Chat
             {
                 UserId = userId,
-                UserName = user.UserName,
                 Message = message,
                 CreatedAt = DateTime.UtcNow
             };

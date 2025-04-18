@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function Register() {
     // state variables for email and passwords
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ function Register() {
     // handle change events for input fields
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === "email") setEmail(value);
+        if (name === "username") setUsername(value);
         if (name === "password") setPassword(value);
         if (name === "confirmPassword") setConfirmPassword(value);
     };
@@ -29,23 +29,21 @@ function Register() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // validate email and passwords
-        if (!email || !password || !confirmPassword) {
+        if (!username || !password || !confirmPassword) {
             setError("Please fill in all fields.");
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError("Please enter a valid email address.");
         } else if (password !== confirmPassword) {
             setError("Passwords do not match.");
         } else {
             // clear error message
             setError("");
             // post data to the /register api
-            fetch("/register", {
+            fetch("account/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email: email,
+                    username: username,
                     password: password,
                 }),
             })
@@ -73,13 +71,13 @@ function Register() {
 
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor="username">Username:</label>
                 </div><div>
                     <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={username}
                         onChange={handleChange}
                     />
                 </div>

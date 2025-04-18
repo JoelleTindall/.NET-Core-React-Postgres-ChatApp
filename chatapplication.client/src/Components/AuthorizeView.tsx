@@ -1,11 +1,11 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React,{ useState, useEffect, createContext } from 'react';
 import { Navigate } from 'react-router-dom';
 
 
 const UserContext = createContext({});
 
 interface User {
-    email: string;
+    username: string;
 }
 
 
@@ -13,7 +13,7 @@ function AuthorizeView(props: { children: React.ReactNode }) {
 
     const [authorized] = useState<boolean>(false);
     const [loading] = useState<boolean>(false); // add a loading state
-    let emptyuser: User = { email: "" };
+    const emptyuser: User = { username: "" };
 
     const [user] = useState(emptyuser);
 
@@ -95,7 +95,7 @@ function AuthorizeView(props: { children: React.ReactNode }) {
         } else {
             return (
                 <>
-                    <Navigate to="/login" />
+                    <Navigate to="account/login" />
                 </>
             )
         }
@@ -105,11 +105,12 @@ function AuthorizeView(props: { children: React.ReactNode }) {
 
 export function AuthorizedUser(props: { value: string }) {
     // Consume the username from the UserContext
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const user: any = React.useContext(UserContext);
 
     // Display the username in a h1 tag
-    if (props.value == "email")
-        return <>{user.email}</>;
+    if (props.value == "username")
+        return <>{user.username}</>;
     else
         return <></>
 }

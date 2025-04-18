@@ -1,6 +1,6 @@
 ﻿using ChatApplication.Server.Data;
 using ChatApplication.Server.Models;
-using Microsoft.AspNetCore.Identity;
+//using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,13 +14,13 @@ namespace ChatApplication.Server.Controllers
     public class AvatarController : ControllerBase
     {
         private readonly ChatAppContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly UserManager<Users> _userManager;
 
 
-        public AvatarController(ChatAppContext context, UserManager<ApplicationUser> userManager)
+        public AvatarController(ChatAppContext context)
         {
             _context = context;
-            _userManager = userManager;
+          //  _userManager = userManager;
         }
 
         public List<Avatar> Avatars { get; set; } = new List<Avatar>();
@@ -39,14 +39,15 @@ namespace ChatApplication.Server.Controllers
         [HttpPost("set")]
         public async Task<IActionResult> SetAvatar([FromBody] int avatarId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _context.Users.FindAsync();
             if (user == null) return Unauthorized();
 
             var avatar = await _context.Avatars.FindAsync(avatarId);
             if (avatar == null) return NotFound("Avatar not found");
 
             user.AvatarId = avatar.Id;
-            await _userManager.UpdateAsync(user);
+             _context.Users.Update(user);
+            await _context.SaveChangesAsync();
 
             return Ok(new { success = true });
         }

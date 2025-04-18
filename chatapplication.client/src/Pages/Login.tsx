@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 function Login() {
     // state variables for email and passwords
-    const [email, setEmail] = useState<string>("");
+    const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [rememberme, setRememberme] = useState<boolean>(false);
+    //const [rememberme, setRememberme] = useState<boolean>(false);
     // state variable for error messages
     const [error, setError] = useState<string>("");
     const navigate = useNavigate();
@@ -13,39 +13,39 @@ function Login() {
     // handle change events for input fields
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === "email") setEmail(value);
+        if (name === "username") setUsername(value);
         if (name === "password") setPassword(value);
-        if (name === "rememberme") setRememberme(e.target.checked);
+       // if (name === "rememberme") setRememberme(e.target.checked);
     };
 
     const handleRegisterClick = () => {
-        navigate("/register");
+        navigate("/account/register");
     }
 
     // handle submit event for the form
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // validate email and passwords
-        if (!email || !password) {
+        if (!username || !password) {
             setError("Please fill in all fields.");
         } else {
             // clear error message
             setError("");
             // post data to the /register api
 
-            var loginurl = "";
-            if (rememberme == true)
-                loginurl = "/login?useCookies=true";
-            else
-                loginurl = "/login?useSessionCookies=true";
+            //let loginurl = "";
+            //if (rememberme == true)
+            //    loginurl = "/login?useCookies=true";
+            //else
+            //    loginurl = "/login?useSessionCookies=true";
 
-            fetch(loginurl, {
+            fetch('account/login', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email: email,
+                    username: username,
                     password: password,
                 }),
             })
@@ -74,14 +74,14 @@ function Login() {
             <h3>Login</h3>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label className="forminput" htmlFor="email">Email:</label>
+                    <label className="forminput" htmlFor="username">Username:</label>
                 </div>
                 <div>
                     <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={username}
                         onChange={handleChange}
                     />
                 </div>
@@ -102,7 +102,7 @@ function Login() {
                         type="checkbox"
                         id="rememberme"
                         name="rememberme"
-                        checked={rememberme}
+                        
                         onChange={handleChange} /><span>Remember Me</span>
                 </div>
                 <div>
