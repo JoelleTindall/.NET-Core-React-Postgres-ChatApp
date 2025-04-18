@@ -19,7 +19,7 @@ function Login() {
     };
 
     const handleRegisterClick = () => {
-        navigate("/account/register");
+        navigate("/register");
     }
 
     // handle submit event for the form
