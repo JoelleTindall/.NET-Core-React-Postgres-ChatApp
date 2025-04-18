@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { AuthorizedUser } from './AuthorizeView';
+// import { AuthorizedUser } from './AuthorizeView';
 import '../assets/styles/AvatarPickerStyle.css';
 // Type definitions
 interface Avatar {
@@ -8,33 +8,33 @@ interface Avatar {
     filePath: string;
 }
 
-interface User {
-    id: string;
-    userName: string;
-    avatar?: Avatar;
-}
+// interface User {
+//     id: string;
+//     userName: string;
+//     avatar?: Avatar;
+// }
 
 
 const AvatarPicker: React.FC = () => {
     const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [isOpen, setOpen] = useState(false);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    // const [setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
 
-        const fetchCurrentUser = async () => {
-            try {
-                const res = await fetch('/pingauth', { credentials: 'include' });
-                if (res.ok) {
-                    const user = await res.json();
-                    setCurrentUserId(user.email); // id is returned from updated pingauth endpoint
-                }
-            } catch (err) {
-                console.error('Failed to get current user:', err);
-            }
-        };
+        // const fetchCurrentUser = async () => {
+        //     try {
+        //         const res = await fetch('/pingauth', { credentials: 'include' });
+        //         if (res.ok) {
+        //             // const user = await res.json();
+        //             // setCurrentUserId(user.email); // id is returned from updated pingauth endpoint
+        //         }
+        //     } catch (err) {
+        //         console.error('Failed to get current user:', err);
+        //     }
+        // };
 
-        fetchCurrentUser();
+        // fetchCurrentUser();
 
         const fetchAvatars = async () => {
             try {

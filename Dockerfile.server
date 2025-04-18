@@ -1,0 +1,28 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set working directory
+WORKDIR /src
+
+# Copy ONLY the server project files (exclude client)
+COPY ChatApplication.sln .
+COPY ChatApplication.Server/*.csproj ./ChatApplication.Server/
+
+# Restore NuGet packages for the SERVER
+RUN dotnet restore "ChatApplication.Server/ChatApplication.Server.csproj"
+
+# Copy server source code
+COPY ChatApplication.Server/ ./ChatApplication.Server/
+
+# Build and publish
+WORKDIR /src/ChatApplication.Server
+RUN dotnet publish -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+# Expose ports (adjust if needed)
+EXPOSE 80
+ENTRYPOINT ["dotnet", "ChatApplication.Server.dll"]

@@ -61,12 +61,12 @@ app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
 }).RequireAuthorization();
 
 
-app.MapGet("/pingauth", (ClaimsPrincipal user) =>
-{
-    var email = user.FindFirstValue(ClaimTypes.Email);
-    var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
-    return Results.Json(new { Email = email, Id = id });
-}).RequireAuthorization();
+// app.MapGet("/pingauth", (ClaimsPrincipal user) =>
+// {
+//     var email = user.FindFirstValue(ClaimTypes.Email);
+//     var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+//     return Results.Json(new { Email = email, Id = id });
+// }).RequireAuthorization();
 
 
 // Configure the HTTP request pipeline.

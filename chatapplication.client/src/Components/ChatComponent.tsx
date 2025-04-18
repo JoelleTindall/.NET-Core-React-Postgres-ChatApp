@@ -32,10 +32,10 @@ interface Chat {
 const ChatComponent: React.FC = () => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [currentUserId] = useState<string | null>(null);
     const [isOpen, setOpen] = useState(false);
     const [connection, setConnection] = useState<HubConnection | null>(null);
-    const [isEditOpen, setEditOpen] = useState(false);
+    // const [isEditOpen, setEditOpen] = useState(false);
 
     const ref = useRef(null);
     const scrollRef = useRef<HTMLDivElement>(null);  // references the bottom of the chat container
@@ -58,17 +58,17 @@ const ChatComponent: React.FC = () => {
     };
 
     // Fetch current user
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await fetch('/pingauth', { credentials: 'include' });
-            if (res.ok) {
-                const user = await res.json();
-                setCurrentUserId(user.id); // id is returned from updated pingauth endpoint
-            }
-        } catch (err) {
-            console.error('Failed to get current user:', err);
-        }
-    };
+    // const fetchCurrentUser = async () => {
+    //     try {
+    //         const res = await fetch('/pingauth', { credentials: 'include' });
+    //         if (res.ok) {
+    //             const user = await res.json();
+    //             setCurrentUserId(user.id); // id is returned from updated pingauth endpoint
+    //         }
+    //     } catch (err) {
+    //         console.error('Failed to get current user:', err);
+    //     }
+    // };
 
     // set up signalr connection
     const connectSignalR = async () => {
@@ -115,7 +115,7 @@ const ChatComponent: React.FC = () => {
         isInitialized.current = true;
 
         fetchChats();
-        fetchCurrentUser();
+        // fetchCurrentUser();
         connectSignalR();
 
         return () => {

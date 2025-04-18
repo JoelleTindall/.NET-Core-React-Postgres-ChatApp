@@ -1,91 +1,60 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from 'vite';
-import plugin from '@vitejs/plugin-react';
-import fs from 'fs';
-import path from 'path';
-import child_process from 'child_process';
-import { env } from 'process';
-
-const baseFolder =
-    env.APPDATA !== undefined && env.APPDATA !== ''
-        ? `${env.APPDATA}/ASP.NET/https`
-        : `${env.HOME}/.aspnet/https`;
-
-const certificateName = "chatapplication.client";
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
-
-if (!fs.existsSync(baseFolder)) {
-    fs.mkdirSync(baseFolder, { recursive: true });
-}
-
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (0 !== child_process.spawnSync('dotnet', [
-        'dev-certs',
-        'https',
-        '--export-path',
-        certFilePath,
-        '--format',
-        'Pem',
-        '--no-password',
-    ], { stdio: 'inherit', }).status) {
-        throw new Error("Could not create certificate.");
-    }
-}
-
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7168';
-
-// https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [plugin()],
-    resolve: {
-        alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
-        }
-    },
-    server: {
-        proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            },
-            '^/chat': {
-                target,
-                secure: false
-            },
-            '^/avatar': {
-                target,
-                secure: false
-            },
-            '^/pingauth': {
-                target,
-                secure: false
-            },
-            '^/register': {
-                target,
-                secure: false
-            },
-            '^/login': {
-                target,
-                secure: false
-            },
-            '^/logout': {
-                target,
-                secure: false
-            },
-            '^/chathub': {
-                target,
-                ws: true,
-                secure: false
-            }
-        },
-        port: 59996,  // Ensure Vite always uses port 59996
-        strictPort: true,
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
-        }
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-})
+  },
+  server: {
+    proxy: {
+      '^/weatherforecast': {
+        target: 'http://server:8080', // Use Docker service name
+        secure: false,
+        changeOrigin: true
+      },
+      '^/chat': {
+        target: 'http://server:8080',
+        secure: false,
+        changeOrigin: true
+      },
+      '^/avatar': {
+        target: 'http://server:8080',
+        secure: false,
+        changeOrigin: true
+      },
+    //   '^/pingauth': {
+    //     target: 'http://server:8080',
+    //     secure: false,
+    //     changeOrigin: true
+    //   },
+      '^/register': {
+        target: 'http://server:8080',
+        secure: false,
+        changeOrigin: true
+      },
+      '^/login': {
+        target: 'http://server:8080',
+        secure: false,
+        changeOrigin: true
+      },
+      '^/logout': {
+        target: 'http://server:8080',
+        secure: false,
+        changeOrigin: true
+      },
+      '^/chathub': {
+        target: 'http://server:8080',
+        ws: true,
+        secure: false,
+        changeOrigin: true
+      }
+    },
+    host: '0.0.0.0',
+    port: 3000,
+    strictPort: true
+  }
+});
