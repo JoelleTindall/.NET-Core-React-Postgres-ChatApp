@@ -2,17 +2,10 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy everything needed for build
 COPY chatapplication.client/ ./
-
-
-# Install dependencies
 RUN npm install
-
-# Build the app
 RUN npm run build
 
-# Serve it with nginx
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
