@@ -1,7 +1,7 @@
-﻿using ChatApplication.Server.Models;
+﻿using ChatApplication.Server.Data;
+using ChatApplication.Server.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using ChatApplication.Server.Data; // Your DbContext
 
 namespace ChatApplication.Server.Hubs
 {
@@ -14,23 +14,22 @@ namespace ChatApplication.Server.Hubs
             _context = context;
         }
 
-        // This method sends a message and includes the user's avatar URL
-        public async Task SendMessage(string userId, string message)
+        public async Task SendMessage(int userId, string message) // Changed from string userId to int
         {
-            // Get the user associated with the userId from the database
+            // Get the user from the plain Users table (no Identity)
             var user = await _context.Users
-                .Include(u => u.Avatar)  // Include Avatar navigation property
+                .Include(u => u.Avatar)  // Include Avatar if needed
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
             {
-                return; // If no user is found, do not proceed
+                return; // User not found
             }
 
-            // Retrieve the user's avatar URL or use a default if not set
-            var avatarUrl = user.Avatar?.FilePath ?? "img/egg.png"; // Default avatar if none exists
+            // Get avatar URL (or default)
+            var avatarUrl = user.Avatar?.FilePath ?? "img/egg.png";
 
-            // Create a new Chat message
+            // Create and save chat message
             var chatMessage = new Chat
             {
                 UserId = userId,
@@ -38,12 +37,11 @@ namespace ChatApplication.Server.Hubs
                 Message = message,
                 CreatedAt = DateTime.UtcNow
             };
-            Console.WriteLine($"Saving chat message: {chatMessage.Message}");
-            // Save the chat message to the database
+
             _context.Chats.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            // Broadcast the message to all connected clients
+            // Broadcast the message
             await Clients.All.SendAsync("ReceiveMessage", userId, user.UserName, message, avatarUrl, chatMessage.CreatedAt);
         }
     }

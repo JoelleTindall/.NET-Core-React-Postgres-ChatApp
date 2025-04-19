@@ -1,75 +1,52 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using ChatApplication.Server.Data;
 using ChatApplication.Server.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using ChatApplication.Server.Hubs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
-using System.Security.Claims;
-
-
+using ChatApplication.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
+
+// --- Services ---
+
+builder.Services.AddDbContext<ChatAppContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ChatAppContext")));
+
+// builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+//     .AddEntityFrameworkStores<ChatAppContext>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+builder.Services.AddSignalR(options =>
 {
-    options.KeepAliveInterval = TimeSpan.FromMinutes(1); // Configure as per your need
-    options.ClientTimeoutInterval = TimeSpan.FromMinutes(2); // Set a timeout interval
+    options.KeepAliveInterval = TimeSpan.FromMinutes(1);
+    options.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:59996") // Your React app's origin
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); // Required if using cookies or authorization
-        });
-});
-// Add services to the container.
-builder.Services.AddDbContext<ChatAppContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ChatAppContext"));
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:59996")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-               .AddEntityFrameworkStores<ChatAppContext>();
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
+// --- Build App ---
 var app = builder.Build();
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.MapIdentityApi<ApplicationUser>();
-
-app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
+// --- Database Auto-Migrate ---
+using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<ChatAppContext>();
+    db.Database.Migrate();
+}
 
-    await signInManager.SignOutAsync();
-    return Results.Ok();
+// --- Middleware ---
 
-}).RequireAuthorization();
-
-
-// app.MapGet("/pingauth", (ClaimsPrincipal user) =>
-// {
-//     var email = user.FindFirstValue(ClaimTypes.Email);
-//     var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
-//     return Results.Json(new { Email = email, Id = id });
-// }).RequireAuthorization();
-
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -78,10 +55,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
+// app.MapIdentityApi<ApplicationUser>();
+
+// app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
+// {
+//     await signInManager.SignOutAsync();
+//     return Results.Ok();
+// }).RequireAuthorization();
+
 app.MapHub<ChatHub>("/chathub");
 
 app.MapFallbackToFile("/index.html");

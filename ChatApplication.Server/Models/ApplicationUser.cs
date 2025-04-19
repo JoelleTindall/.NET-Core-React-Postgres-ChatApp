@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
 
 namespace ChatApplication.Server.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser
     {
-        public int? AvatarId { get; set; }  // FK to Avatar table
-        // Add navigation property to Avatar
+        public int? AvatarId { get; set; }
         public virtual Avatar Avatar { get; set; }
 
         public ApplicationUser()
@@ -14,5 +13,5 @@ namespace ChatApplication.Server.Models
             AvatarId = 1;
         }
 
-    }
+    }c
 }

@@ -1,0 +1,37 @@
+### Get all chats
+GET http://localhost:8080/chat
+Accept: application/json
+
+
+### Post a new chat message
+POST http://localhost:8080/chat
+Content-Type: application/json
+
+{
+  "message": "Hello world!"
+}
+###
+
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "message": "Hello world!"
+}
+
+
+###
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "message": "Hello world!"
+}
+###
+POST http://localhost:8080/api/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "securepassword123"
+}
