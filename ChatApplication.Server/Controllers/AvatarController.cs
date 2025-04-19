@@ -52,22 +52,5 @@ namespace ChatApplication.Server.Controllers
             return Ok(new { success = true });
         }
 
-        //// POST api/<AvatarContoller>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<AvatarContoller>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<AvatarContoller>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

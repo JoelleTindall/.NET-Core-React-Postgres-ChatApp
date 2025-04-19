@@ -1,32 +1,17 @@
-﻿namespace ChatApplication.Server.Models
+﻿
+namespace ChatApplication.Server.Models
 {
     public class User
     {
         public int Id { get; set; }
-        public string UserName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public int? AvatarId { get; set; } = 1; // FK to Avatar table
-                                            // Add navigation property to Avatar
-        public virtual Avatar? Avatar { get; set; }
+        public required string UserName { get; set; }
+        public required string PasswordHash { get; set; }
+        public required string PasswordSalt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-
+        // Navigation properties
+        public int? AvatarId { get; set; }
+        public Avatar Avatar { get; set; }
+        public required ICollection<Chat> Chats { get; set; }
     }
 }
-////using Microsoft.AspNetCore.Identity;
-
-//namespace ChatApplication.Server.Models
-//{
-//    public class ApplicationUser : IdentityUser
-//    {
-//public int? AvatarId { get; set; }  // FK to Avatar table
-//                                    // Add navigation property to Avatar
-//public virtual Avatar Avatar { get; set; }
-
-//public ApplicationUser()
-//{
-//    // Set default AvatarId to "1" (or whatever default ID you want)
-//    AvatarId = 1;
-//}
-
-//    }
-//}

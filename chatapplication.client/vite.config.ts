@@ -11,11 +11,6 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '/api/weatherforecast': {
-                target: 'http://server:8080', // Use Docker service name
-                secure: false,
-                changeOrigin: true
-            },
             '/api/chat': {
                 target: 'http://server:8080',
                 secure: false,
@@ -26,7 +21,17 @@ export default defineConfig({
                 secure: false,
                 changeOrigin: true
             },
-            '/api/account/': {
+            '/api/register': {
+                target: 'http://server:8080',
+                secure: false,
+                changeOrigin: true
+            },
+            '/api/login': {
+                target: 'http://server:8080',
+                secure: false,
+                changeOrigin: true
+            },
+            '/api/logout': {
                 target: 'http://server:8080',
                 secure: false,
                 changeOrigin: true

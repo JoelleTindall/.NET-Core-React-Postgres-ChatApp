@@ -1,4 +1,24 @@
 services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: ChatApplicationDb
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
+    restart: "no"  # Don't restart once it's done
+
   server:
     build:
       context: .
@@ -7,6 +27,10 @@ services:
       - "3001:8080"
     depends_on:
       - db
+      - migrator
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
 
   client:
     build:
@@ -14,6 +38,7 @@ services:
       dockerfile: Dockerfile.client
     ports:
       - "3000:3000"
+
   proxy:
     build: 
       context: .
@@ -23,11 +48,3 @@ services:
     depends_on:
       - client
       - server
-  db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: chatapp

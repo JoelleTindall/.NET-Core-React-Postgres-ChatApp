@@ -14,10 +14,11 @@ namespace ChatApplication.Server.Data
         {
         }
 
-        public DbSet<Chat> Chats { get; set; } = default!;
-        public DbSet<Avatar> Avatars { get; set; } = default!;
         public DbSet<User> Users { get; set; } = default!;
 
+        public DbSet<Chat> Chats { get; set; } = default!;
+        public DbSet<Avatar> Avatars { get; set; } = default!;
+    
         protected override void OnModelCreating(ModelBuilder builder)
         {
            // 8da2ec45 - a26a - 4643 - ac5c - b0514f2eb803
@@ -28,18 +29,19 @@ namespace ChatApplication.Server.Data
             new Avatar { Id = 3, FilePath = "img/mad.png" }
 
 );
-            builder.Entity<Chat>()
-                .HasOne(c => c.User) // A chat has one user
-                .WithMany() // A user can have many chats
-                .HasForeignKey(c => c.UserId) // Foreign key to Users table
-                .IsRequired(false); // Make it optional if needed
-               
             // Define the relationship between ApplicationUser and Avatar
             builder.Entity<User>()
                 .HasOne(u => u.Avatar)  // A user has one avatar
                 .WithMany()              // One avatar can be used by multiple users
                 .HasForeignKey(u => u.AvatarId) // Foreign key to Avatar table
             .IsRequired(false);
+
+            builder.Entity<Chat>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Chats)
+                .HasForeignKey(c => c.UserId);
+
+
         }
 
 

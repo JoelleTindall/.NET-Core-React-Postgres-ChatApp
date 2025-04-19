@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 function Register() {
-    // state variables for email and passwords
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,7 +35,7 @@ function Register() {
             // clear error message
             setError("");
             // post data to the /register api
-            fetch("/api/register", {
+            fetch("/api/account/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

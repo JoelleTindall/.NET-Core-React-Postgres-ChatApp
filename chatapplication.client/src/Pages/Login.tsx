@@ -31,13 +31,6 @@ function Login() {
         } else {
             // clear error message
             setError("");
-            // post data to the /register api
-
-            //let loginurl = "";
-            //if (rememberme == true)
-            //    loginurl = "/login?useCookies=true";
-            //else
-            //    loginurl = "/login?useSessionCookies=true";
 
             fetch('/api/account/login', {
                 method: "POST",
@@ -97,14 +90,14 @@ function Login() {
                         onChange={handleChange}
                     />
                 </div>
-                <div>
-                    <input
-                        type="checkbox"
-                        id="rememberme"
-                        name="rememberme"
+                {/*<div>*/}
+                {/*    <input*/}
+                {/*        type="checkbox"*/}
+                {/*        id="rememberme"*/}
+                {/*        name="rememberme"*/}
                         
-                        onChange={handleChange} /><span>Remember Me</span>
-                </div>
+                {/*        onChange={handleChange} /><span>Remember Me</span>*/}
+                {/*</div>*/}
                 <div>
                     <button type="submit">Login</button>
                 </div>

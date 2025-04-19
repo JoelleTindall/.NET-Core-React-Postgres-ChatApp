@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApplication.Server.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    [Migration("20250418182741_Init")]
-    partial class Init
+    [Migration("20250419194316_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,10 @@ namespace ChatApplication.Server.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
@@ -95,7 +99,14 @@ namespace ChatApplication.Server.Migrations
                     b.Property<int?>("AvatarId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Password")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordSalt")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -113,8 +124,10 @@ namespace ChatApplication.Server.Migrations
             modelBuilder.Entity("ChatApplication.Server.Models.Chat", b =>
                 {
                     b.HasOne("ChatApplication.Server.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Chats")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -126,6 +139,11 @@ namespace ChatApplication.Server.Migrations
                         .HasForeignKey("AvatarId");
 
                     b.Navigation("Avatar");
+                });
+
+            modelBuilder.Entity("ChatApplication.Server.Models.User", b =>
+                {
+                    b.Navigation("Chats");
                 });
 #pragma warning restore 612, 618
         }

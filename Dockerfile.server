@@ -1,19 +1,21 @@
+# Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
 
-COPY ChatApplication.sln .
 COPY ChatApplication.Server/*.csproj ./ChatApplication.Server/
-
 RUN dotnet restore "ChatApplication.Server/ChatApplication.Server.csproj"
 
-COPY ChatApplication.Server/ ./ChatApplication.Server/
-WORKDIR /src/ChatApplication.Server
-RUN dotnet publish -c Release --self-contained false -o /app/publish
+COPY . .
+
+RUN dotnet build "ChatApplication.Server/ChatApplication.Server.csproj" -c Release -o /app/build
+
+RUN dotnet publish "ChatApplication.Server/ChatApplication.Server.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
 WORKDIR /app
+
 COPY --from=build /app/publish .
 
-EXPOSE 8080
 ENTRYPOINT ["dotnet", "ChatApplication.Server.dll"]

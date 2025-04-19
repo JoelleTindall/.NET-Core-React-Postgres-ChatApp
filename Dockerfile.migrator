@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /src
+
+COPY ChatApplication.sln .
+COPY ChatApplication.Server/*.csproj ./ChatApplication.Server/
+RUN dotnet restore "ChatApplication.Server/ChatApplication.Server.csproj"
+
+COPY ChatApplication.Server/ ./ChatApplication.Server/
+WORKDIR /src/ChatApplication.Server
+
+# Install dotnet-ef CLI
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+ENTRYPOINT ["dotnet", "ef", "database", "update", "--project", "ChatApplication.Server.csproj", "--startup-project", "."]
