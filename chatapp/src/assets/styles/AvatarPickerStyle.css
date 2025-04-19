@@ -1,0 +1,12 @@
+.avatar-list {
+    list-style:none;
+    padding:0;
+}
+
+.avatar-list-item {
+    display:inline;
+}
+
+    .avatar-list-item:hover {
+        filter: drop-shadow(0 0 0.75rem crimson);
+    }
