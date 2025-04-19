@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{8EC462
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		Dockerfile.client = Dockerfile.client
+		Dockerfile.proxy = Dockerfile.proxy
 		Dockerfile.server = Dockerfile.server
 	EndProjectSection
 EndProject

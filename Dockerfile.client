@@ -1,11 +1,7 @@
-FROM node:20-alpine AS build
-
+FROM node:20-alpine
 WORKDIR /app
-
-COPY chatapplication.client/ ./
-RUN npm install
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
+COPY chatapplication.client/package.json .
+RUN yarn install
+COPY chatapplication.client ./
+EXPOSE 3000
+CMD [ "yarn", "dev" ]

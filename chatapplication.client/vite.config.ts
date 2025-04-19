@@ -12,27 +12,27 @@ export default defineConfig({
     server: {
         proxy: {
             '/api/weatherforecast': {
-                target: 'http://server:5000', // Use Docker service name
+                target: 'http://server:8080', // Use Docker service name
                 secure: false,
                 changeOrigin: true
             },
             '/api/chat': {
-                target: 'http://server:5000',
+                target: 'http://server:8080',
                 secure: false,
                 changeOrigin: true
             },
             '/api/avatar': {
-                target: 'http://server:5000',
+                target: 'http://server:8080',
                 secure: false,
                 changeOrigin: true
             },
             '/api/account/': {
-                target: 'http://server:5000',
+                target: 'http://server:8080',
                 secure: false,
                 changeOrigin: true
             },
             '/api/chathub': {
-                target: 'http://server:5000',
+                target: 'http://server:8080',
                 ws: true,
                 secure: false,
                 changeOrigin: true

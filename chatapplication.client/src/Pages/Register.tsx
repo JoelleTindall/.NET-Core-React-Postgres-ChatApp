@@ -47,7 +47,6 @@ function Register() {
                     password: password,
                 }),
             })
-                //.then((response) => response.json())
                 .then((data) => {
                     // handle success or error from the server
                     console.log(data);
@@ -60,7 +59,7 @@ function Register() {
                 .catch((error) => {
                     // handle network error
                     console.error(error);
-                    setError("Error registering.");
+                    setError("Network Error.");
                 });
         }
     };
