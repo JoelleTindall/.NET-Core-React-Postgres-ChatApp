@@ -5,7 +5,7 @@ import { useClickAway } from 'react-use';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Rotate as Hamburger } from 'hamburger-react';
 import LogoutLink from './LogoutLink';
-import { AuthorizedUser } from './AuthorizeView';
+//import { AuthorizedUser } from './AuthorizeView';
 import AvatarPicker from './AvatarPicker';
 import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
@@ -186,7 +186,7 @@ const ChatComponent: React.FC = () => {
                                 <li><AvatarPicker /></li>
                                 <li>
                                     <LogoutLink>
-                                        Logout (<AuthorizedUser value="email" />)
+                                        Logout 
                                     </LogoutLink>
                                 </li>
                             </ul>
