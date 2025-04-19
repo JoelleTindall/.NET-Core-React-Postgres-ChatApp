@@ -32,7 +32,7 @@ function Login() {
             // clear error message
             setError("");
 
-            fetch('/api/account/login', {
+            fetch('/api/login', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -48,7 +48,7 @@ function Login() {
                     console.log(data);
                     if (data.ok) {
                         setError("Successful Login.");
-                        window.location.href = '/';
+                        window.location.href = '/Chat';
                     }
                     else
                         setError("Error Logging In.");
