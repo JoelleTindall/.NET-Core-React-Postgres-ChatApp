@@ -1,5 +1,6 @@
 ﻿using ChatApplication.Server.Data;
 using ChatApplication.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +11,8 @@ namespace ChatApplication.Server.Controllers
         public string Message { get; set; }
     }
 
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("chat")]
     public class ChatController : ControllerBase
     {
         private readonly ChatAppContext _context;
@@ -21,6 +22,7 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpGet(Name = "GetChats")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
         {
             var chats = await _context.Chats
@@ -33,6 +35,7 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDto incomingChat)
         {
             // Hardcoded demo user - REPLACE THIS WITH YOUR ACTUAL USER AUTH LOGIC

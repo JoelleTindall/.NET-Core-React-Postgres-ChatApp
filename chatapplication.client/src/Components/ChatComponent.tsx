@@ -5,7 +5,7 @@ import { useClickAway } from 'react-use';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Rotate as Hamburger } from 'hamburger-react';
 import LogoutLink from './LogoutLink';
-//import { AuthorizedUser } from './AuthorizeView';
+import { jwtDecode } from "jwt-decode";
 import AvatarPicker from './AvatarPicker';
 import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
@@ -32,9 +32,11 @@ interface Chat {
 const ChatComponent: React.FC = () => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
-    const [currentUserId] = useState<string | null>(null);
+    const [currentUser, setUsername] = useState<string | null>(null);
+    const [currentUserId, setUserId] = useState<string | null>(null);
     const [isOpen, setOpen] = useState(false);
     const [connection, setConnection] = useState<HubConnection | null>(null);
+    //const [token, setToken] = useState('');
     // const [isEditOpen, setEditOpen] = useState(false);
 
     const ref = useRef(null);
@@ -48,7 +50,7 @@ const ChatComponent: React.FC = () => {
     // Fetch chat messages
     const fetchChats = async () => {
         try {
-            const response = await fetch('/chat');
+            const response = await fetch('/api/chat');
             if (!response.ok) throw new Error('Failed to fetch chats');
             const data: Chat[] = await response.json();
             setChats(data);
@@ -57,18 +59,14 @@ const ChatComponent: React.FC = () => {
         }
     };
 
-    // Fetch current user
-    // const fetchCurrentUser = async () => {
-    //     try {
-    //         const res = await fetch('/pingauth', { credentials: 'include' });
-    //         if (res.ok) {
-    //             const user = await res.json();
-    //             setCurrentUserId(user.id); // id is returned from updated pingauth endpoint
-    //         }
-    //     } catch (err) {
-    //         console.error('Failed to get current user:', err);
-    //     }
-    // };
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const decodedToken = jwtDecode<{ sub: string, userId: string }>(token);
+            setUsername(decodedToken.sub);
+            setUserId(decodedToken.userId);
+        }
+    }, []);
 
     // set up signalr connection
     const connectSignalR = async () => {
@@ -76,7 +74,7 @@ const ChatComponent: React.FC = () => {
         if (isConnected.current) return;
 
         const hubConnection = new HubConnectionBuilder()
-            .withUrl('/chathub', {
+            .withUrl('/api/chathub', {
                 transport: HttpTransportType.WebSockets,
                 skipNegotiation: true
             })
@@ -186,7 +184,7 @@ const ChatComponent: React.FC = () => {
                                 <li><AvatarPicker /></li>
                                 <li>
                                     <LogoutLink>
-                                        Logout 
+                                        Logout {currentUser }
                                     </LogoutLink>
                                 </li>
                             </ul>

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
+
 
 function Login() {
     // state variables for email and passwords
@@ -25,41 +27,45 @@ function Login() {
     // handle submit event for the form
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // validate email and passwords
+
         if (!username || !password) {
             setError("Please fill in all fields.");
-        } else {
-            // clear error message
-            setError("");
-
-            fetch('/api/login', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                }),
-            })
-
-                .then((data) => {
-                    // handle success or error from the server
-                    console.log(data);
-                    if (data.ok) {
-                        setError("Successful Login.");
-                        window.location.href = '/Chat';
-                    }
-                    else
-                        setError("Error Logging In.");
-
-                })
-                .catch((error) => {
-                    // handle network error
-                    console.error(error);
-                    setError("Error Logging in.");
-                });
+            return;
         }
+
+        setError("");
+
+        fetch('/api/login', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            }),
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error("Login failed");
+                }
+
+                const data = await response.json(); // Parse the actual body from the response
+
+                const token = data.token;
+                localStorage.setItem("token", token);
+
+                const decodedToken = jwtDecode<{ sub: string, userId: string }>(token);
+                const loggedInUsername = decodedToken.sub;
+                //const loggedInUserId = decodedToken.userId;
+
+                console.log("Logged in as:", loggedInUsername);
+                window.location.href = '/Chat';
+            })
+            .catch((error) => {
+                console.error(error);
+                setError("Error logging in.");
+            });
     };
 
     return (

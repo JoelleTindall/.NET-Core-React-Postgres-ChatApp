@@ -6,6 +6,10 @@ using ChatApplication.Server.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace ChatApplication.Server.Controllers
@@ -15,10 +19,12 @@ namespace ChatApplication.Server.Controllers
     public class LoginController : Controller
     {
         private readonly ChatAppContext _context;
+        private readonly IConfiguration _config;
 
-        public LoginController(ChatAppContext context)
+        public LoginController(ChatAppContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -29,52 +35,22 @@ namespace ChatApplication.Server.Controllers
                 return BadRequest("Both fields are required.");
             }
 
-            //using var hmac = new HMACSHA512();
-            //var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-            //var passwordSalt = hmac.Key;
-
-            //string UserName = loginDto.Username;
-            //var PasswordHash = Convert.ToBase64String(passwordHash);
-            //var PasswordSalt = Convert.ToBase64String(passwordSalt);
-            //(u => u.UserName == loginDto.Username && u.PasswordHash == PasswordHash && u.PasswordSalt == PasswordSalt))
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Username);
 
-            //if (await _context.Users.AnyAsync(u => u.UserName == loginDto.Username))
-           // {
-                if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
-                {
-                    return Ok(new
-                    {
-                        Id = user.Id,
-                        Username = user.UserName,
-                        Message = "Login successful"
-                    });
-                }
-                else
-                {
-                    return Unauthorized("Invalid username or password");
-                }
+            if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                string userId= user.Id.ToString();
+                var token = GenerateJwtToken(loginDto.Username, userId);
+                return Ok(new 
+                { 
+                    token
+                });
+            }
+            else
+            {
+                return Unauthorized("Invalid username or password");
+            }
 
-                
-        
-            //using var hmac = new HMACSHA512();
-            //var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-            //var passwordSalt = hmac.Key;
-
-            //var UserName = loginDto.Username;
-            //var PasswordHash = Convert.ToBase64String(passwordHash);
-            //var PasswordSalt = Convert.ToBase64String(passwordSalt);
-
-
-            //_context.Users.Add(user);
-            //await _context.SaveChangesAsync();
-
-            //return Ok(new
-            //{
-            //    Id = user.Id,
-            //    Username = user.UserName,
-            //    Message = "Registration successful"
-            //});
 
         }
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
@@ -90,6 +66,28 @@ namespace ChatApplication.Server.Controllers
                 if (computedHash[i] != hashBytes[i]) return false;
             }
             return true;
+        }
+
+        private string GenerateJwtToken(string username, string id)
+        {
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim("userId", id),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
