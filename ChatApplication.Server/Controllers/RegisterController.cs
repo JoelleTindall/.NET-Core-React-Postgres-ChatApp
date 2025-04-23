@@ -42,6 +42,7 @@ namespace ChatApplication.Server.Controllers
                 PasswordHash = Convert.ToBase64String(passwordHash),
                 PasswordSalt = Convert.ToBase64String(passwordSalt),
                 CreatedAt = DateTime.UtcNow,
+                AvatarId = 1, // Default avatar ID
                 Chats = new List<Chat>() // Initialize Chats as an empty list
             };
             _context.Users.Add(user);

@@ -22,7 +22,7 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpGet(Name = "GetChats")]
-        [Authorize]
+    
         public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
         {
             var chats = await _context.Chats
@@ -35,7 +35,7 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+    
         public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDto incomingChat)
         {
             // Hardcoded demo user - REPLACE THIS WITH YOUR ACTUAL USER AUTH LOGIC

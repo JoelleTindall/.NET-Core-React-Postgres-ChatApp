@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 // import { AuthorizedUser } from './AuthorizeView';
 import '../assets/styles/AvatarPickerStyle.css';
+import { jwtDecode } from 'jwt-decode';
 // Type definitions
 interface Avatar {
     id: string;
@@ -18,27 +19,23 @@ interface Avatar {
 const AvatarPicker: React.FC = () => {
     const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [isOpen, setOpen] = useState(false);
-    // const [setCurrentUserId] = useState<string | null>(null);
+    const [currentUserId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const decodedToken = jwtDecode<{ sub: string, userId: string }>(token);
+            setUserId(decodedToken.userId);
+        }
+    }, []);
 
     useEffect(() => {
 
-        // const fetchCurrentUser = async () => {
-        //     try {
-        //         const res = await fetch('/pingauth', { credentials: 'include' });
-        //         if (res.ok) {
-        //             // const user = await res.json();
-        //             // setCurrentUserId(user.email); // id is returned from updated pingauth endpoint
-        //         }
-        //     } catch (err) {
-        //         console.error('Failed to get current user:', err);
-        //     }
-        // };
-
-        // fetchCurrentUser();
-
         const fetchAvatars = async () => {
             try {
-                const response = await fetch('/avatar');
+                const response = await fetch('/api/avatar', {
+                    method: 'GET',
+                });
                 if (!response.ok) throw new Error('Failed to fetch avatars');
                 const data: Avatar[] = await response.json();
                 setAvatars(data);
@@ -54,13 +51,16 @@ const AvatarPicker: React.FC = () => {
 
     const handleSetAvatar = async (avatarId: string) => {
         try {
-            const response = await fetch('/avatar/set', {
+            const response = await fetch('/api/avatar/set', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(avatarId)
+                body: JSON.stringify({
+                    avatarId: parseInt(avatarId),
+                    userId: currentUserId ? parseInt(currentUserId) : null,
+                }),
             });
 
             if (!response.ok) {

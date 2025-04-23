@@ -47,6 +47,15 @@ const ChatComponent: React.FC = () => {
 
     useClickAway(ref, () => setOpen(false));
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const decodedToken = jwtDecode<{ sub: string, userId: string }>(token);
+            setUsername(decodedToken.sub);
+            setUserId(decodedToken.userId);
+        }
+    }, []);
+
     // Fetch chat messages
     const fetchChats = async () => {
         try {
@@ -59,14 +68,7 @@ const ChatComponent: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            const decodedToken = jwtDecode<{ sub: string, userId: string }>(token);
-            setUsername(decodedToken.sub);
-            setUserId(decodedToken.userId);
-        }
-    }, []);
+
 
     // set up signalr connection
     const connectSignalR = async () => {
@@ -74,7 +76,7 @@ const ChatComponent: React.FC = () => {
         if (isConnected.current) return;
 
         const hubConnection = new HubConnectionBuilder()
-            .withUrl('/api/chathub', {
+            .withUrl('/chathub', {
                 transport: HttpTransportType.WebSockets,
                 skipNegotiation: true
             })

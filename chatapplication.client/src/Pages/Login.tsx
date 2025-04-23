@@ -60,7 +60,7 @@ function Login() {
                 //const loggedInUserId = decodedToken.userId;
 
                 console.log("Logged in as:", loggedInUsername);
-                window.location.href = '/Chat';
+                navigate("/chat");
             })
             .catch((error) => {
                 console.error(error);

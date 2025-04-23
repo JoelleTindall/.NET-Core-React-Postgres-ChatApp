@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApplication.Server.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    [Migration("20250419194316_init")]
-    partial class init
+    [Migration("20250422230623_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -76,10 +76,6 @@ namespace ChatApplication.Server.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
