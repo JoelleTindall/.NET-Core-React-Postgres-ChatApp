@@ -1,15 +1,13 @@
 ﻿using ChatApplication.Server.Data;
 using ChatApplication.Server.Models;
+using ChatApplication.Server.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatApplication.Server.Controllers
 {
-    public class NewChatDto
-    {
-        public string Message { get; set; }
-    }
+
 
     [Route("api/[controller]")]
     [ApiController]
@@ -22,48 +20,65 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpGet(Name = "GetChats")]
-    
-        public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
+
+        public async Task<ActionResult<IEnumerable<GetChatsDTO>>> GetChats()
         {
+           // Console.WriteLine("GetChats endpoint hit");
             var chats = await _context.Chats
                 .Include(c => c.User)
                 .ThenInclude(u => u.Avatar)
                 .OrderBy(c => c.CreatedAt)
+                .Select(c => new
+                {
+                    id = c.Id,
+                    message = c.Message,
+                    createdAt = c.CreatedAt,
+                    user = new
+                    {
+                        id = c.User.Id.ToString(),
+                        userName = c.User.UserName,
+                        avatar = new
+                        {
+                            id = c.User.Avatar.Id,
+                            filePath = c.User.Avatar.FilePath
+                        }
+                    }
+                })
                 .ToListAsync();
 
             return Ok(chats);
         }
 
-        [HttpPost]
-    
-        public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDto incomingChat)
-        {
-            // Hardcoded demo user - REPLACE THIS WITH YOUR ACTUAL USER AUTH LOGIC
-            var userId = 1; // Example: Get from session/token instead of Identity
-            var user = await _context.Users
-                .Include(u => u.Avatar)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+        //[HttpPost]
 
-            if (user == null) return Unauthorized();
+        //public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDTO incomingChat)
+        //{
+        //    // Hardcoded demo user - REPLACE THIS WITH YOUR ACTUAL USER AUTH LOGIC
+        //    var userId = 1; // Example: Get from session/token instead of Identity
+        //    var user = await _context.Users
+        //        .Include(u => u.Avatar)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
 
-            var newChat = new Chat
-            {
-                Message = incomingChat.Message,
-                CreatedAt = DateTime.UtcNow,
-                UserId = userId, // Set foreign key directly
-                //UserName = user.UserName
-            };
+        //    if (user == null) return Unauthorized();
 
-            _context.Chats.Add(newChat);
-            await _context.SaveChangesAsync();
+        //    var newChat = new Chat
+        //    {
+        //        Message = incomingChat.Message,
+        //        CreatedAt = DateTime.UtcNow,
+        //        UserId = userId, // Set foreign key directly
+        //        //UserName = user.UserName
+        //    };
 
-            // Return the saved chat with user/avatar data
-            var result = await _context.Chats
-                .Include(c => c.User)
-                .ThenInclude(u => u.Avatar)
-                .FirstOrDefaultAsync(c => c.Id == newChat.Id);
+        //    _context.Chats.Add(newChat);
+        //    await _context.SaveChangesAsync();
 
-            return Ok(result);
-        }
+        //    // Return the saved chat with user/avatar data
+        //    var result = await _context.Chats
+        //        .Include(c => c.User)
+        //        .ThenInclude(u => u.Avatar)
+        //        .FirstOrDefaultAsync(c => c.Id == newChat.Id);
+
+        //    return Ok(result);
+        //}
     }
 }

@@ -35,18 +35,18 @@ const ChatComponent: React.FC = () => {
     const [currentUser, setUsername] = useState<string | null>(null);
     const [currentUserId, setUserId] = useState<string | null>(null);
     const [isOpen, setOpen] = useState(false);
-    const [connection, setConnection] = useState<HubConnection | null>(null);
-    //const [token, setToken] = useState('');
-    // const [isEditOpen, setEditOpen] = useState(false);
-
     const ref = useRef(null);
-    const scrollRef = useRef<HTMLDivElement>(null);  // references the bottom of the chat container
+    const scrollRef = useRef<HTMLDivElement>(null);  // references the bottom of the chat container for scrollin
     const isFirstLoad = useRef(true);  
-    const isConnected = useRef(false);  // track whether SignalR is already connected
-    const isInitialized = useRef(false); // To avoid effect running multiple times
+    const isConnected = useRef(false);  // track if chathub is connected
+    const connectionRef = useRef<HubConnection | null>(null);
 
+ 
+    // Close menu when clicking outside
     useClickAway(ref, () => setOpen(false));
 
+
+    // Get current user from local storage
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -63,6 +63,8 @@ const ChatComponent: React.FC = () => {
             if (!response.ok) throw new Error('Failed to fetch chats');
             const data: Chat[] = await response.json();
             setChats(data);
+           // console.log("Fetched chats:", data);
+
         } catch (error) {
             console.error('Error fetching chat messages:', error);
         }
@@ -72,21 +74,25 @@ const ChatComponent: React.FC = () => {
 
     // set up signalr connection
     const connectSignalR = async () => {
-        // Prevent connection if already connected
+        // prevent connection if already connected
         if (isConnected.current) return;
 
         const hubConnection = new HubConnectionBuilder()
             .withUrl('/chathub', {
                 transport: HttpTransportType.WebSockets,
-                skipNegotiation: true
+                skipNegotiation: true,
+                withCredentials: true
             })
+            //.configureLogging(LogLevel.Information)
             .withAutomaticReconnect()
+            
             .build();
+        connectionRef.current = hubConnection;
 
-        // Remove any existing listeners before adding new ones
+        // Remove existing listeners before adding new ones
         hubConnection.off("ReceiveMessage");
 
-        // Add handler for receiving messages
+        // handler for receiving messages
         hubConnection.on("ReceiveMessage", (userId, userName, message, avatarUrl, createdAt) => {
             const newChat = {
                 id: crypto.randomUUID(),
@@ -104,29 +110,25 @@ const ChatComponent: React.FC = () => {
 
         // Start the connection
         await hubConnection.start();
-        setConnection(hubConnection);
         isConnected.current = true;  // Mark as connected
-        console.log("Connected to SignalR hub!");
+    
     };
 
-    // Effect to fetch chats and user on mount
+  // fetch chats from signalr chathub
     useEffect(() => {
-        if (isInitialized.current) return;
-        isInitialized.current = true;
-
+        if (!currentUserId || isConnected.current) return;
+        
         fetchChats();
-        // fetchCurrentUser();
         connectSignalR();
 
         return () => {
             // Cleanup signalr connection on unmount
-            if (connection) {
-                connection.stop();
-                isConnected.current = false;  // Reset connection flag
-                console.log("Disconnected from SignalR hub.");
+            if (connectionRef.current) {
+                connectionRef.current.stop();
+                isConnected.current = false; 
             }
         };
-    }, []); // Empty dependency array ensures effect runs only once
+    }, [currentUserId]); // currentUserId to ensure chats displayed correctly
 
     // Scroll to bottom function
     const scrollToBottom = () => {
@@ -152,9 +154,9 @@ const ChatComponent: React.FC = () => {
     }, [chats,isOpen]);  // trigger scroll on every chat update
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !connection || !currentUserId) return;
+        if (!newMessage.trim() || !connectionRef.current || !currentUserId) return;
         try {
-            await connection.invoke("SendMessage", currentUserId, newMessage);
+            await connectionRef.current.invoke("SendMessage", parseInt(currentUserId), newMessage);
             setNewMessage('');
         } catch (err) {
             console.error("Error sending message through SignalR:", err);

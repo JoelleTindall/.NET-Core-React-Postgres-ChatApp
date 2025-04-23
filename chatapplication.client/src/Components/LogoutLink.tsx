@@ -6,36 +6,17 @@ function LogoutLink(props: { children: React.ReactNode }) {
     const navigate = useNavigate();
 
 
-    const handleSubmit = (e: React.FormEvent<HTMLAnchorElement>) => {
+    const handleLogout = (e: React.FormEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        fetch("/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: ""
 
-        })
-            .then((data) => {
-                if (data.ok) {
-
-                    navigate("/login");
-                }
-                else {
-                    //error
-                }
-
-
-            })
-            .catch((error) => {
-                console.error(error);
-            })
+        localStorage.removeItem("token");
+        navigate("/login");
 
     };
 
     return (
         <>
-            <a href="#" onClick={handleSubmit}>{props.children}</a>
+            <a href="#" onClick={handleLogout}>{props.children}</a>
         </>
     );
 }

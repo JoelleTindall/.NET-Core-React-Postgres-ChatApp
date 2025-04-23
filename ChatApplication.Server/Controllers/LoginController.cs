@@ -9,7 +9,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.AspNetCore.SignalR;
 
 
 namespace ChatApplication.Server.Controllers
@@ -53,6 +52,7 @@ namespace ChatApplication.Server.Controllers
 
 
         }
+
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
         {
             var saltBytes = Convert.FromBase64String(storedSalt);

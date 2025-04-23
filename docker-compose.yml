@@ -15,9 +15,9 @@ services:
     depends_on:
       - db
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      
       - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
-    restart: "no"  # Don't restart once it's done
+    restart: "no"  
 
   server:
     build:
@@ -29,7 +29,7 @@ services:
       - db
       - migrator
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+     
       - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
 
   client:
@@ -37,14 +37,4 @@ services:
       context: .
       dockerfile: Dockerfile.client
     ports:
-      - "3000:3000"
-
-  proxy:
-    build: 
-      context: .
-      dockerfile: Dockerfile.proxy
-    ports: 
-      - "8080:80"
-    depends_on:
-      - client
-      - server
+      - "3000:80"
