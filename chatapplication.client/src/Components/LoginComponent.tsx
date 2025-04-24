@@ -23,7 +23,6 @@ function Login() {
         if (register) {
             if (name === "confirmPassword") setConfirmPassword(value);
         }
-        // if (name === "rememberme") setRememberme(e.target.checked);
     };
 
 
