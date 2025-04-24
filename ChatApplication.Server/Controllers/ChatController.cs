@@ -49,36 +49,5 @@ namespace ChatApplication.Server.Controllers
             return Ok(chats);
         }
 
-        //[HttpPost]
-
-        //public async Task<ActionResult<Chat>> PostChat([FromBody] NewChatDTO incomingChat)
-        //{
-        //    // Hardcoded demo user - REPLACE THIS WITH YOUR ACTUAL USER AUTH LOGIC
-        //    var userId = 1; // Example: Get from session/token instead of Identity
-        //    var user = await _context.Users
-        //        .Include(u => u.Avatar)
-        //        .FirstOrDefaultAsync(u => u.Id == userId);
-
-        //    if (user == null) return Unauthorized();
-
-        //    var newChat = new Chat
-        //    {
-        //        Message = incomingChat.Message,
-        //        CreatedAt = DateTime.UtcNow,
-        //        UserId = userId, // Set foreign key directly
-        //        //UserName = user.UserName
-        //    };
-
-        //    _context.Chats.Add(newChat);
-        //    await _context.SaveChangesAsync();
-
-        //    // Return the saved chat with user/avatar data
-        //    var result = await _context.Chats
-        //        .Include(c => c.User)
-        //        .ThenInclude(u => u.Avatar)
-        //        .FirstOrDefaultAsync(c => c.Id == newChat.Id);
-
-        //    return Ok(result);
-        //}
     }
 }

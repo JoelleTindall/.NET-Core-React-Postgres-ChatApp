@@ -40,7 +40,6 @@ const ChatComponent: React.FC = () => {
     const isFirstLoad = useRef(true);  
     const isConnected = useRef(false);  // track if chathub is connected
     const connectionRef = useRef<HubConnection | null>(null);
-
  
     // Close menu when clicking outside
     useClickAway(ref, () => setOpen(false));
@@ -165,6 +164,7 @@ const ChatComponent: React.FC = () => {
 
     return (
         <div className="wrapper third-color">
+
             <ul className="chat-header">
                 <li className="a"><h2>Chat It Up!</h2></li>
                 <li></li>

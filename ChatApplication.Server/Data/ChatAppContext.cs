@@ -1,6 +1,5 @@
 ﻿using System.Reflection.Emit;
 using ChatApplication.Server.Models;
-//using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -15,13 +14,11 @@ namespace ChatApplication.Server.Data
         }
 
         public DbSet<User> Users { get; set; } = default!;
-
         public DbSet<Chat> Chats { get; set; } = default!;
         public DbSet<Avatar> Avatars { get; set; } = default!;
     
         protected override void OnModelCreating(ModelBuilder builder)
         {
-           // 8da2ec45 - a26a - 4643 - ac5c - b0514f2eb803
             base.OnModelCreating(builder);
             builder.Entity<Avatar>().HasData(
             new Avatar { Id = 1, FilePath = "img/cat.png" },
@@ -37,9 +34,9 @@ namespace ChatApplication.Server.Data
             .IsRequired(false);
 
             builder.Entity<Chat>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.Chats)
-                .HasForeignKey(c => c.UserId);
+                .HasOne(c => c.User) // A chat belongs to one user
+                .WithMany(u => u.Chats) // One user can have many chats
+                .HasForeignKey(c => c.UserId); // Foreign key to User table
 
 
         }

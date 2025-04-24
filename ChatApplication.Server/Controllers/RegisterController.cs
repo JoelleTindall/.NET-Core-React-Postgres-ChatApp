@@ -56,19 +56,5 @@ namespace ChatApplication.Server.Controllers
             });
         }
 
-        private bool VerifyPassword(string password, string storedHash, string storedSalt)
-        {
-            var saltBytes = Convert.FromBase64String(storedSalt);
-            var hashBytes = Convert.FromBase64String(storedHash);
-
-            using var hmac = new HMACSHA512(saltBytes);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != hashBytes[i]) return false;
-            }
-            return true;
-        }
     }
 }

@@ -1,16 +1,17 @@
 
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 function LogoutLink(props: { children: React.ReactNode }) {
 
-    const navigate = useNavigate();
-
+    //const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const handleLogout = (e: React.FormEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-
-        localStorage.removeItem("token");
-        navigate("/login");
+        logout();
+        //localStorage.removeItem("token");
+        //navigate("/login");
 
     };
 

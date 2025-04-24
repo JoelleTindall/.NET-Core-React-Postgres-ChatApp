@@ -1,12 +1,20 @@
 import ChatComponent from "../Components/ChatComponent.tsx";
-//import AvatarPicker from "../Components/AvatarPicker.tsx";
+import Login from "../Components/LoginComponent.tsx";
+import { useAuth } from "../Context/AuthContext";
 
-//needs to check if user is logged in and redirect to login if not
+
 function Chat() {
-    return (
-        <ChatComponent/>
+    const { loggedIn } = useAuth();
+    
+        if (loggedIn)
+        {
+            return <ChatComponent/>;
+        } else {
+            return <Login />;
+        }
+
   
-  );
+   
 }
 
 export default Chat;
