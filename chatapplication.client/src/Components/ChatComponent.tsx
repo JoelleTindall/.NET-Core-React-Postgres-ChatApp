@@ -184,7 +184,7 @@ const ChatComponent: React.FC = () => {
                             transition={{ duration: 0.2 }}
                         >
                             <ul className="menu-list">
-                                <li><p>Edit User</p></li>
+                          
                                 <li><AvatarPicker /></li>
                                 <li>
                                     <LogoutLink>
