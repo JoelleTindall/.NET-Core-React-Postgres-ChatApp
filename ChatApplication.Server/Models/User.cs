@@ -10,7 +10,7 @@ namespace ChatApplication.Server.Models
         public DateTime CreatedAt { get; set; }
 
         // Navigation properties
-        public int? AvatarId { get; set; }
+        public int AvatarId { get; set; }
         public Avatar Avatar { get; set; }
         public required ICollection<Chat> Chats { get; set; }
     }

@@ -5,6 +5,7 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig(({ mode }) => {
     const isDev = mode === 'development';
     const targetHost = isDev ? 'http://localhost:8080' : 'http://server:8080';
+    // const chathubApi = isDev ? '/chathub' : '/api/chathub';
 
     return {
         plugins: [react()],
@@ -40,7 +41,7 @@ export default defineConfig(({ mode }) => {
                     secure: false,
                     changeOrigin: true
                 },
-                '/api/chathub': {
+                '/chathub': {
                     target: targetHost,
                     ws: true,
                     secure: false,

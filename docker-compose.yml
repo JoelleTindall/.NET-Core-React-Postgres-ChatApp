@@ -16,7 +16,7 @@ services:
       - db
     environment:
       
-      - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
+      - ConnectionStrings__ChatAppContext=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
     restart: "no"  
 
   server:
@@ -30,7 +30,7 @@ services:
       - migrator
     environment:
      
-      - ConnectionStrings__DefaultConnection=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
+      - ConnectionStrings__ChatAppContext=Host=db;Database=ChatApplicationDb;Username=postgres;Password=mysecretpassword
 
   client:
     build:
