@@ -18,15 +18,17 @@ docker compose up --build
 npm install
 ```
 
+### Build and start db container
+
 ```sh
 docker compose build
 ```
 
 ```sh
-docker start reactchat-db-1
+docker start net-core-react-postgres-chatapp-db-1
 ```
 
-### Start the dev server
+### Start the front and backend dev servers
 
 ```sh
 npm run dev

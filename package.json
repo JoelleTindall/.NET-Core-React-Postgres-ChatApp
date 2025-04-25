@@ -1,10 +1,12 @@
 {
-  "name": "chatapplication.client",
+  "name": "chatapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "client":"cd chatapplication.client && vite --port 3000 --mode development",
+    "server":"cd ChatApplication.Server && set ASPNETCORE_ENVIRONMENT=Development && dotnet run",
+    "dev": "start npm run client && start npm run server",
     "build": "tsc -b && CI=false vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview"
