@@ -27,6 +27,11 @@ docker compose build
 ```sh
 docker start net-core-react-postgres-chatapp-db-1
 ```
+### Run migrations container
+
+```sh
+docker start net-core-react-postgres-chatapp-migrator-1
+```
 
 ### Start the front and backend dev servers
 
