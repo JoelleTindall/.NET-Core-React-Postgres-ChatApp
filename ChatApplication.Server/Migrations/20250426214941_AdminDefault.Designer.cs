@@ -3,6 +3,7 @@ using System;
 using ChatApplication.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApplication.Server.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    partial class ChatAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250426214941_AdminDefault")]
+    partial class AdminDefault
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,10 +124,10 @@ namespace ChatApplication.Server.Migrations
                         {
                             Id = 1,
                             AvatarId = 1,
-                            CreatedAt = new DateTime(2025, 4, 27, 19, 43, 48, 869, DateTimeKind.Utc).AddTicks(8168),
+                            CreatedAt = new DateTime(2025, 4, 26, 21, 49, 40, 936, DateTimeKind.Utc).AddTicks(8881),
                             IsAdmin = true,
-                            PasswordHash = "6PIoyjwA5TSKVuYhKKBnInXmnsRFCLSBEsObl/HwK/r0QYzE6pXgqLL5OLNZ3JCw0aXThIDFG6GCh0B8jVVkEg==",
-                            PasswordSalt = "uODGNtsy8eSINKr2xruuVtla1WVNBWl7G2iLHj3Lv1qmqAM104yHCWqHfiHN5JZV2HoDEXVH/KPVlrFJz8u6GxIKJf7t87GB0PEN5/phZ3i++7TRRMz44zb4HPWSqG1avHwCm51ZcK4jGeykWzcOJIn5ltJK3zw7jOxa4M+fqOs=",
+                            PasswordHash = "tiJw8Jp8bLqnHKI9zQS/CycuH2lvQYSO4BF+9zmc/I7jh3TovbjCvsre/JiUwXbyc8m6qenC342ediotcN6NEw==",
+                            PasswordSalt = "8uzyQb1b8M+WnuOJcGpMvJ8xfzwMpyIyFIwj7gv57kL3oS40NC7mQqbAJ1YyDROEpHg7yacOqIcpzz4zjwD/6YcHlL53Mtb/SwrmIIc4boPHid8xz09bFyVvmxrWqU5qInR8oXLl9I2SQU66uV0qHE6h770iHGjY7vxLLCVMc8s=",
                             UserName = "Admin"
                         });
                 });

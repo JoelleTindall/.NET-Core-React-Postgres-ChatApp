@@ -3,6 +3,7 @@ using System;
 using ChatApplication.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApplication.Server.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    partial class ChatAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250426210156_Admin")]
+    partial class Admin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,7 +98,7 @@ namespace ChatApplication.Server.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsAdmin")
+                    b.Property<bool?>("IsAdmin")
                         .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
@@ -115,18 +118,6 @@ namespace ChatApplication.Server.Migrations
                     b.HasIndex("AvatarId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AvatarId = 1,
-                            CreatedAt = new DateTime(2025, 4, 27, 19, 43, 48, 869, DateTimeKind.Utc).AddTicks(8168),
-                            IsAdmin = true,
-                            PasswordHash = "6PIoyjwA5TSKVuYhKKBnInXmnsRFCLSBEsObl/HwK/r0QYzE6pXgqLL5OLNZ3JCw0aXThIDFG6GCh0B8jVVkEg==",
-                            PasswordSalt = "uODGNtsy8eSINKr2xruuVtla1WVNBWl7G2iLHj3Lv1qmqAM104yHCWqHfiHN5JZV2HoDEXVH/KPVlrFJz8u6GxIKJf7t87GB0PEN5/phZ3i++7TRRMz44zb4HPWSqG1avHwCm51ZcK4jGeykWzcOJIn5ltJK3zw7jOxa4M+fqOs=",
-                            UserName = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("ChatApplication.Server.Models.Chat", b =>

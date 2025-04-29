@@ -20,14 +20,25 @@ namespace ChatApplication.Server.Controllers
         }
 
         [HttpGet(Name = "GetChats")]
-
-        public async Task<ActionResult<IEnumerable<GetChatsDTO>>> GetChats()
+        public async Task<ActionResult<IEnumerable<GetChatsDTO>>> GetChats([FromQuery] DateTime? before = null, [FromQuery] int pageSize = 10)
         {
-           // Console.WriteLine("GetChats endpoint hit");
-            var chats = await _context.Chats
+            // gets the chats from the database
+            var query = _context.Chats
                 .Include(c => c.User)
                 .ThenInclude(u => u.Avatar)
-                .OrderBy(c => c.CreatedAt)
+                .OrderByDescending(c => c.CreatedAt)  // newest first
+
+                .AsQueryable();
+
+            //compares the last datetime already returned to the next (previous) chat in the database
+            if (before.HasValue)
+            {
+                query = query.Where(c => c.CreatedAt < before.Value);
+            }
+
+            //returns max 10 chats at a time
+            var chats = await query
+                .Take(pageSize)
                 .Select(c => new
                 {
                     id = c.Id,
@@ -46,8 +57,9 @@ namespace ChatApplication.Server.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(chats);
+            return Ok(chats.OrderBy(c => c.createdAt)); // return oldest to newest
         }
+
 
     }
 }

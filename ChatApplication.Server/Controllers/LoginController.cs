@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Linq.Expressions;
 
 
 namespace ChatApplication.Server.Controllers
@@ -35,21 +36,29 @@ namespace ChatApplication.Server.Controllers
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Username);
-
-            if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
+            if (user != null)
             {
-                string userId= user.Id.ToString();
-                var token = GenerateJwtToken(loginDto.Username, userId);
-                return Ok(new 
-                { 
-                    token
-                });
+
+                if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
+                {
+                    string userId = user.Id.ToString();
+                    string isAdmin = user.IsAdmin.ToString();
+
+                    var token = GenerateJwtToken(loginDto.Username, userId, isAdmin);
+                    return Ok(new
+                    {
+                        token
+                    });
+                }
+                else
+                {
+                    return Unauthorized("Invalid username or password");
+                }
             }
             else
             {
                 return Unauthorized("Invalid username or password");
             }
-
 
         }
 
@@ -68,12 +77,13 @@ namespace ChatApplication.Server.Controllers
             return true;
         }
 
-        private string GenerateJwtToken(string username, string id)
+        private string GenerateJwtToken(string username, string id, string isAdmin)
         {
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim("userId", id),
+            new Claim("role", isAdmin),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
