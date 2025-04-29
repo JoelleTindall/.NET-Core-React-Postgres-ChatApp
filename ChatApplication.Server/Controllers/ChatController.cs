@@ -26,6 +26,8 @@ namespace ChatApplication.Server.Controllers
             var query = _context.Chats
                 .Include(c => c.User)
                 .ThenInclude(u => u.Avatar)
+                .Where(c => (c.IsDeleted == false || c.IsDeleted == null)
+                && (c.User.IsBanned == false || c.User.IsBanned == null))  //return only chats that are not deleted from users not banned (including null for backwards compatibility)
                 .OrderByDescending(c => c.CreatedAt)  // newest first
 
                 .AsQueryable();

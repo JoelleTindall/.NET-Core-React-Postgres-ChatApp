@@ -9,6 +9,8 @@ import { jwtDecode } from 'jwt-decode';
 import AvatarPicker from './AvatarPicker';
 import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
+import AdminComponent from './AdminComponent';
+import AdminView from './AdminView';
 
 interface Avatar {
     id: string;
@@ -99,6 +101,15 @@ const ChatComponent: React.FC = () => {
                 },
             };
             setChats((prev) => [...prev, newChat]);
+        });
+
+        connection.on('RemovedChat', (chatId) => {
+            setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+        });
+
+        connection.on('UserBanned', (userId) => {
+            console.log('User banned:', userId);
+            setChats((prevChats) => prevChats.filter((chat) => chat.user.id !== userId));
         });
 
         await connection.start();
@@ -230,7 +241,7 @@ const ChatComponent: React.FC = () => {
                             transition={{ duration: 0.2 }}
                         >
                             <ul className="menu-list">
-                                {currentUserAdmin && <li>Admin</li>}
+                                {currentUserAdmin && <li><AdminView/></li>}
                                 <li><AvatarPicker /></li>
                                 <li>
                                     <LogoutLink>Logout {currentUser}</LogoutLink>
@@ -261,7 +272,7 @@ const ChatComponent: React.FC = () => {
                                 <div className="chat-bubble">
                                     <div className="username-date">
                                         <div className="username first-color">
-                                            <span>{chat.user.userName}</span>
+                                            <span>{currentUserAdmin ? <AdminComponent selectedChat={{userid:chat.user.id, username:chat.user.userName, id:chat.id, connection:connectionRef.current}}/> : chat.user.userName} </span>
                                         </div>
                                         <div className="date">
                                             <span>
