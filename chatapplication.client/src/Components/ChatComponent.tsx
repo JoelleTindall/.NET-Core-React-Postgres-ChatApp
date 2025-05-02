@@ -11,7 +11,6 @@ import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
 import AdminComponent from './AdminComponent';
 import AdminView from './AdminView';
-
 interface Avatar {
     id: string;
     filePath: string;
@@ -28,6 +27,7 @@ interface Chat {
     message: string;
     createdAt: string;
     user: User;
+    isDeleted?: boolean;
 }
 
 const ChatComponent: React.FC = () => {
@@ -63,7 +63,7 @@ const ChatComponent: React.FC = () => {
     // Initial fetch
     const fetchChats = async () => {
         try {
-            const response = await fetch('/api/chat');
+            const response = await fetch('/api/chat/');
             if (!response.ok) throw new Error('Failed to fetch chats');
             const data: Chat[] = await response.json();
             setChats(data);
@@ -103,13 +103,25 @@ const ChatComponent: React.FC = () => {
             setChats((prev) => [...prev, newChat]);
         });
 
-        connection.on('RemovedChat', (chatId) => {
-            setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+        connection.on('ToggleDelete', (chatId, isDeleted) => {
+            if (isDeleted) {
+                // update chats to exclude deleted chats
+                setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+            } else {
+                // update chats to include chats that were recently restored
+                fetchChats();
+            };
+            
         });
 
-        connection.on('UserBanned', (userId) => {
-            console.log('User banned:', userId);
-            setChats((prevChats) => prevChats.filter((chat) => chat.user.id !== userId));
+        connection.on('UserBanned', (userId,isBanned) => {
+            if (isBanned) {
+                // update chats to exclude banned user
+                setChats((prevChats) => prevChats.filter((chat) => chat.user.id !== userId));
+            } else {
+                // update chats to include chats from users that were recently unbanned
+                fetchChats();
+            }
         });
 
         await connection.start();
@@ -241,11 +253,9 @@ const ChatComponent: React.FC = () => {
                             transition={{ duration: 0.2 }}
                         >
                             <ul className="menu-list">
-                                {currentUserAdmin && <li><AdminView/></li>}
+                                {currentUserAdmin && <li><AdminView connection={connectionRef.current} currentuser={currentUserId} /></li>}
                                 <li><AvatarPicker /></li>
-                                <li>
-                                    <LogoutLink>Logout {currentUser}</LogoutLink>
-                                </li>
+                                <li> <LogoutLink>Logout {currentUser}</LogoutLink></li>
                             </ul>
                         </motion.div>
                     </AnimatePresence>
@@ -272,7 +282,7 @@ const ChatComponent: React.FC = () => {
                                 <div className="chat-bubble">
                                     <div className="username-date">
                                         <div className="username first-color">
-                                            <span>{currentUserAdmin ? <AdminComponent selectedChat={{userid:chat.user.id, username:chat.user.userName, id:chat.id, connection:connectionRef.current}}/> : chat.user.userName} </span>
+                                            <span>{currentUserAdmin ? <AdminComponent selectedChat={{ userid: chat.user.id, username: chat.user.userName, id: chat.id, connection: connectionRef.current, currentuser: currentUserId }} /> : chat.user.userName} </span>
                                         </div>
                                         <div className="date">
                                             <span>

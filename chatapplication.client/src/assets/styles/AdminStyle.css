@@ -1,0 +1,117 @@
+div.toolswrapper {
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    border-top:1px solid black;
+    width: 75vw;
+    margin: 0 auto;
+    border-radius: 30px;
+    height: 58vh;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+    
+}
+
+
+
+.adminwrapper.adminopened:hover {
+    text-shadow: none;
+    font-weight: normal;
+}
+
+div.usernames {
+    width: 90%;
+    border: 1px solid black;
+    margin: 0 auto;
+    margin-top: 25px;
+    height:80%;
+    overflow-y:scroll;
+}
+
+.usernames table {
+    width:100%;
+}
+
+div.userdetails {
+    width: 90%;
+    border: 1px solid grey;
+    margin: 0 auto;
+    margin-top: 25px;
+    height: 80%;
+/*    overflow-y: scroll;*/
+}
+
+.userdetails table {
+    width: 100%;
+}
+
+
+.userdetails div.messagelabel {
+    font-weight: bold;
+    background-color:lightgray;
+        border-top: 1px solid grey;
+     
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}
+.userstatus{
+    font-weight:bold;
+    background-color:lightgreen;
+}
+
+.userstatus.banned {
+    background-color: lightcoral;
+}
+
+.userrole.admin {
+    background-color: lightblue;
+}
+
+a.edituser:hover {
+    text-decoration: underline;
+}
+
+.name-ban-admin button {
+    background-color: lightcoral;
+    margin: 2px;
+}
+
+div.userchats {
+    overflow-y: scroll;
+    width: 100%;
+    margin: 0 auto;
+    height: 70%;
+    border-top: dashed 1px black;
+  
+}
+
+td.usermessage {
+    word-break: break-all;
+    text-align: left;
+}
+
+tr.removed {
+    background-color: lightcoral;
+}
+
+.removed button {
+    background-color:lightgreen;
+}
+
+td button {
+    background-color:lightblue;
+}
+/*div.userchats {
+    width: 90%;
+    border: 1px solid black;
+    margin: 0 auto;
+    margin-top: 25px;
+    height: 40%;
+    overflow-y: scroll;
+}
+*/
+

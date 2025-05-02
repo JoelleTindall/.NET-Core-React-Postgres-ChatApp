@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "client":"cd chatapplication.client && vite --port 3000 --mode development",
-    "server":"cd ChatApplication.Server && set ASPNETCORE_ENVIRONMENT=Development && dotnet run",
+    "client": "cd chatapplication.client && vite --port 3000 --mode development",
+    "server": "cd ChatApplication.Server && set ASPNETCORE_ENVIRONMENT=Development && dotnet run",
     "dev": "start npm run client && start npm run server",
     "build": "tsc -b && CI=false vite build --mode production",
     "lint": "eslint .",
@@ -34,6 +34,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "react-favicon": "^2.0.7",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace ChatApplication.Server.Controllers
 {
 
@@ -19,6 +20,35 @@ namespace ChatApplication.Server.Controllers
             _context = context;
         }
 
+        //return all chats for single user 
+        [HttpGet("{userid}")]
+        public async Task<IActionResult> UserChats(int userid)
+        {
+            var query = _context.Chats
+                .Include(c => c.User)
+                .Where(c => c.UserId == userid)
+                .AsQueryable();
+
+            var chats = await query
+                .Select(c => new
+                {
+                    id = c.Id,
+                    message = c.Message,
+                    createdAt = c.CreatedAt,
+                    isDeleted = c.IsDeleted,
+                    user = new
+                    {
+                        id = c.User.Id.ToString(),
+                        userName = c.User.UserName,
+
+                    }
+                })
+                .ToListAsync();
+
+            return Ok(chats);
+        }
+
+        //return all chats for all users, 10 at a time
         [HttpGet(Name = "GetChats")]
         public async Task<ActionResult<IEnumerable<GetChatsDTO>>> GetChats([FromQuery] DateTime? before = null, [FromQuery] int pageSize = 10)
         {

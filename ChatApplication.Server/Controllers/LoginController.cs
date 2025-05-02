@@ -41,6 +41,11 @@ namespace ChatApplication.Server.Controllers
 
                 if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
                 {
+                    if (user.IsBanned == true)
+                    {
+                        return Unauthorized("User is banned");
+                    }
+
                     string userId = user.Id.ToString();
                     string isAdmin = user.IsAdmin.ToString();
 

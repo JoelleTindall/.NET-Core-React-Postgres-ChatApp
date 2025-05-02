@@ -1,7 +1,7 @@
 //import { useAuth } from "../Context/AuthContext";
 import { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
-import {HubConnection } from '@microsoft/signalr';
+import { HubConnection } from '@microsoft/signalr';
 
 interface AdminProps {
     selectedChat: {
@@ -9,6 +9,7 @@ interface AdminProps {
         username: string;
         userid: string;
         connection: HubConnection | null;
+        currentuser: string | null; 
     };
 }
 
@@ -45,7 +46,7 @@ const AdminComponent: React.FC<AdminProps> = ({ selectedChat }) => {
     const banUser = (e: React.FormEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         handleBanUser();
-        
+
 
     }
 
@@ -70,13 +71,14 @@ const AdminComponent: React.FC<AdminProps> = ({ selectedChat }) => {
             <a href="#" onClick={openOptions}>{selectedChat.username}</a>
             {isOpen && (
                 <div ref={menuRef} >
-                    <ul style={{ listStyleType: 'none', padding:'0' }}>
+                    <ul style={{ listStyleType: 'none', padding: '0' }}>
                         <li>
                             <a href="#" onClick={deleteChat}>Delete Chat</a>
                         </li>
+                        {selectedChat.currentuser != selectedChat.userid && ( 
                         <li>
                             <a href="#" onClick={banUser}>Ban User</a>
-                        </li>
+                        </li>)}
                     </ul>
                 </div>
             )}

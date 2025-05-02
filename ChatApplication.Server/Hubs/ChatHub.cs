@@ -22,10 +22,15 @@ namespace ChatApplication.Server.Hubs
             if (chatMessage != null)
             {
                 // Mark the chat message as deleted
-                chatMessage.IsDeleted = true;
-                await _context.SaveChangesAsync();
-                await Clients.All.SendAsync("RemovedChat", chatMessage.Id);
 
+                chatMessage.IsDeleted = !chatMessage.IsDeleted;
+                await _context.SaveChangesAsync();
+                await Clients.All.SendAsync("ToggleDelete", chatMessage.Id, chatMessage.IsDeleted);
+
+            }
+            else
+            {
+                Console.WriteLine("message not found.");
             }
         }
 
@@ -34,16 +39,18 @@ namespace ChatApplication.Server.Hubs
             var user = await _context.Users.FindAsync(userId);
             if (user != null)
             {
-                if (user.IsBanned == true)
+                if (user.IsBanned == null)
                 {
-                    Console.WriteLine($" {userId} is already banned.");
-                    return; // If the user is already banned, do not proceed
+                    user.IsBanned = true;
                 }
-
-                user.IsBanned = true;
+                else
+                {
+                    user.IsBanned = !user.IsBanned;
+                }
                 await _context.SaveChangesAsync();
-                await Clients.All.SendAsync("UserBanned", (user.Id).ToString());
-            } else
+                await Clients.All.SendAsync("UserBanned", (user.Id).ToString(), user.IsBanned);
+            }
+            else
             {
                 Console.WriteLine("user not found.");
             }

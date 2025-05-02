@@ -41,6 +41,11 @@ export default defineConfig(({ mode }) => {
                     secure: false,
                     changeOrigin: true
                 },
+                '/api/user': {
+                    target: targetHost,
+                    secure: false,
+                    changeOrigin: true
+                },
                 '/chathub': {
                     target: targetHost,
                     ws: true,
