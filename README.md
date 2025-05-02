@@ -38,3 +38,9 @@ docker start net-core-react-postgres-chatapp-migrator-1
 ```sh
 npm run dev
 ```
+
+## Default admin credentials
+```sh
+UN: Admin
+PW: Admin
+```
