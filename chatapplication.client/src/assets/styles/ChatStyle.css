@@ -75,6 +75,13 @@ div .chatview {
     margin: 0 5% 1% 5%;
 }
 
+div.loading {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin:auto;
+}
+
 div.chat-input-container {
     margin: 0 5% 5% 5%;
     height: 10%;
@@ -194,7 +201,9 @@ max-height:45px;
     padding-left:2px;
 }
 
-
+a:hover {
+    text-decoration:underline;
+}
 
 .first-color {
     background: #cadefc;

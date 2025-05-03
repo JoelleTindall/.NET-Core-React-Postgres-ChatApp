@@ -41,6 +41,11 @@ namespace ChatApplication.Server.Controllers
 
                 if (VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
                 {
+                    if (user.IsBanned == true)
+                    {
+                        return Unauthorized("User is banned");
+                    }
+
                     string userId = user.Id.ToString();
                     string isAdmin = user.IsAdmin.ToString();
 
@@ -83,7 +88,7 @@ namespace ChatApplication.Server.Controllers
             {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim("userId", id),
-            new Claim("role", isAdmin),
+            new Claim("isAdmin", (isAdmin).ToLower()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

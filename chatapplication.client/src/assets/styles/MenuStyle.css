@@ -33,7 +33,7 @@ z-index:50;
         margin-bottom: 20px;
     }
 
-        .menu-list li *:hover {
+        .menu-list li:hover {
 
             text-shadow: 4px 4px 8px rgba(0,0,0,0.47);
             font-weight:bold;

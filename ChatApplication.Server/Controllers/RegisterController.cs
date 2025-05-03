@@ -43,6 +43,7 @@ namespace ChatApplication.Server.Controllers
                 PasswordSalt = Convert.ToBase64String(passwordSalt),
                 CreatedAt = DateTime.UtcNow,
                 IsAdmin = false, // Default to false for new users
+                IsBanned = false, // Default to false for new users
                 AvatarId = 1, // Default avatar ID
                 Chats = new List<Chat>() // Initialize Chats as an empty list
             };

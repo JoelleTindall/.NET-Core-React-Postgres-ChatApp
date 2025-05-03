@@ -42,6 +42,7 @@ namespace ChatApplication.Server.Data
                     CreatedAt = DateTime.UtcNow,
                     IsAdmin = true,
                     AvatarId = 1, // Default avatar ID
+                    IsBanned = false, // Default to false for new users
                     Chats = new List<Chat>() // Initialize Chats as an empty list});
                 });
 

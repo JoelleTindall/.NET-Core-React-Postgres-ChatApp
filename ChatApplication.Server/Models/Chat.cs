@@ -7,6 +7,7 @@
         public  User User { get; set; } // Navigation property
         public  string Message { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool? IsDeleted { get; set; }
 
     }
 }

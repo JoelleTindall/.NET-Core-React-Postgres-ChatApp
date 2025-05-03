@@ -9,5 +9,6 @@
         public int UserId { get; set; }
         public string UserName { get; set; }
         public string AvatarFilePath { get; set; }
+        public bool? IsDeleted { get; set; }
     }
 }

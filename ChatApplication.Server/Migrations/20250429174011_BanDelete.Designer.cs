@@ -3,6 +3,7 @@ using System;
 using ChatApplication.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApplication.Server.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    partial class ChatAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250429174011_BanDelete")]
+    partial class BanDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,11 +130,11 @@ namespace ChatApplication.Server.Migrations
                         {
                             Id = 1,
                             AvatarId = 1,
-                            CreatedAt = new DateTime(2025, 5, 3, 20, 12, 21, 689, DateTimeKind.Utc).AddTicks(5255),
+                            CreatedAt = new DateTime(2025, 4, 29, 17, 40, 10, 906, DateTimeKind.Utc).AddTicks(3823),
                             IsAdmin = true,
                             IsBanned = false,
-                            PasswordHash = "0srhd/WksINaAVxGGXCYZ1yvn5vrBgt8zyYwx95jsR79+uHf4IJx4R0oj6wQ0yyyK5A+HsShTabpVcygaKmXEg==",
-                            PasswordSalt = "F8Gg9y7bWhRbNIWSHXR+aWyXEGWep09le4ztRvdxO1R4oTk/M34TewhINuw7KutqzSP3/LI3YizsZXpTxmYBSpZY0IXZq6S2P1WQ+NIPzv3Y6olM5XYVkA3xDCqUq9KgGMV61bK25k1PNj+joMf+ilm+ty/0vFBZaaaiaEetgrk=",
+                            PasswordHash = "U1HV4LMfNmOZ2lH5+9z8ljWxn3x6wu/e8CzSQf7vpGO6YdIp+PESVQloQDkRrvLLsToNb7sDkYzBL+8WSZ4Clg==",
+                            PasswordSalt = "cOCr+pRnE00gryX9urWCDjoGjzKKg2YhzhnOQ3SyucKRZvhH0GLxJPz05jwYO6EtNIiHON6ftkI2jCRHcMNQBzj1flZXYkcH+vEmECeQ9D+gvD1RHvz9SVnughacZ/Z5byJh2+TEhZtFc0tzKAhq2D613C6/p0ymBtagYrxbAAE=",
                             UserName = "Admin"
                         });
                 });
