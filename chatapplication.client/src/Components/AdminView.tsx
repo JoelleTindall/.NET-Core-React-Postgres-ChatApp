@@ -226,7 +226,7 @@ const AdminView: React.FC<AdminProps> = ({ connection, currentuser }) => {
                                     <tr className="name-ban-admin">
                                         <td>{selectedUser.userName}</td>
                                             <td><button disabled={selectedUser.id == currentuser} onClick={(e) => banUser(e, selectedUser)}>{selectedUser.isBanned ? "Unban" : "Ban"}</button></td>
-                                            <td><button onClick={(e) => makeAdmin(e, selectedUser)}>{selectedUser.isAdmin ? "Revoke" : "Grant"}</button></td>
+                                            <td><button disabled={selectedUser.isBanned} onClick={(e) => makeAdmin(e, selectedUser)}>{selectedUser.isAdmin ? "Revoke" : "Grant"}</button></td>
                                     </tr>
                                 </tbody>
                                 </table>

@@ -11,6 +11,8 @@ import '../assets/styles/ChatStyle.css';
 import '../assets/styles/MenuStyle.css';
 import AdminComponent from './AdminComponent';
 import AdminView from './AdminView';
+import { useIdleTimer } from 'react-idle-timer'; 
+import { useAuth } from "../Context/AuthContext";
 interface Avatar {
     id: string;
     filePath: string;
@@ -35,10 +37,10 @@ const ChatComponent: React.FC = () => {
     const [newMessage, setNewMessage] = useState<string>('');
     const [currentUser, setUsername] = useState<string | null>(null);
     const [currentUserId, setUserId] = useState<string | null>(null);
-    const [currentUserAdmin, setCurrentUserAdmin] = useState<boolean>(false);
+    const [currentUserAdmin, setCurrentUserAdmin] = useState<boolean | null>(false);
     const [isOpen, setOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const isFirstLoad = useRef(true);
     const isConnected = useRef(false);
     const connectionRef = useRef<HubConnection | null>(null);
@@ -46,27 +48,42 @@ const ChatComponent: React.FC = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const scrollAnchorRef = useRef<HTMLDivElement>(null);
     const scrolledUp = useRef(true);
+    const { logout } = useAuth();
 
+    //this is buggy and needs to be reworked
     useClickAway(menuRef, () => setOpen(false));
+
+    //auto logs out user after 5 minutes of inactivity
+    useIdleTimer({
+        timeout: 5 * 60 * 1000, // 5 mins
+        onIdle: logout,
+        debounce: 500, // .5 secs
+    });
 
     // Get current user info
     useEffect(() => {
+        console.log('Getting current user info...');
         const token = localStorage.getItem('token');
+
         if (token) {
-            const decoded = jwtDecode<{ sub: string; userId: string; role: string }>(token);
+            const decoded = jwtDecode<{ sub: string; userId: string; isAdmin: string }>(token);
             setUsername(decoded.sub);
             setUserId(decoded.userId);
-            setCurrentUserAdmin(decoded.role === 'True');
+            setCurrentUserAdmin(decoded.isAdmin === 'true');
+
         }
+
     }, []);
 
     // Initial fetch
     const fetchChats = async () => {
+        console.log('Fetching chats...');
         try {
             const response = await fetch('/api/chat/');
             if (!response.ok) throw new Error('Failed to fetch chats');
             const data: Chat[] = await response.json();
             setChats(data);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching chat messages:', error);
         }
@@ -75,7 +92,7 @@ const ChatComponent: React.FC = () => {
     // SignalR setup
     const connectSignalR = async () => {
         if (isConnected.current) return;
-
+        console.log('connecting signalr...');
         const connection = new HubConnectionBuilder()
             .withUrl('/chathub', {
                 transport: HttpTransportType.WebSockets,
@@ -111,13 +128,17 @@ const ChatComponent: React.FC = () => {
                 // update chats to include chats that were recently restored
                 fetchChats();
             };
-            
+
         });
 
-        connection.on('UserBanned', (userId,isBanned) => {
+        connection.on('UserBanned', (userId, isBanned) => {
             if (isBanned) {
                 // update chats to exclude banned user
                 setChats((prevChats) => prevChats.filter((chat) => chat.user.id !== userId));
+                //logs the banned user out
+                if (currentUserId === userId) {
+                    logout();
+                };
             } else {
                 // update chats to include chats from users that were recently unbanned
                 fetchChats();
@@ -130,8 +151,10 @@ const ChatComponent: React.FC = () => {
 
     useEffect(() => {
         if (!currentUserId || isConnected.current) return;
+        console.log('fetch chats, connect signalr...');
         fetchChats();
         connectSignalR();
+
 
         return () => {
             if (connectionRef.current) {
@@ -180,6 +203,7 @@ const ChatComponent: React.FC = () => {
 
     // Auto-scroll on first load
     useEffect(() => {
+        console.log('auto scroll first load...');
         if (chats.length > 0 && isFirstLoad.current) {
             scrollToBottom();
             isFirstLoad.current = false;
@@ -230,17 +254,18 @@ const ChatComponent: React.FC = () => {
 
     return (
         <div className="wrapper third-color">
-            <ul className="chat-header">
-                <li className="a">
-                    <h2>Chat It Up!</h2>
-                </li>
-                <li></li>
-                <li className="b">
-                    <div className="hamburger-btn">
-                        <Hamburger toggled={isOpen} toggle={setOpen} />
-                    </div>
-                </li>
-            </ul>
+            
+                <ul className="chat-header">
+                    <li className="a">
+                        <h2>{currentUserAdmin ? "Admin Chat" : "Chat It Up!"}</h2>
+                    </li>
+                    <li></li>
+                    <li className="b">
+                        <div className="hamburger-btn">
+                        <Hamburger toggled={isOpen} toggle={setOpen} disabled={loading } />
+                        </div>
+                    </li>
+                </ul>
 
             {isOpen && (
                 <div className="menu-wrapper" ref={menuRef}>
@@ -267,7 +292,7 @@ const ChatComponent: React.FC = () => {
                 id="ChatView"
                 ref={scrollContainerRef}
                 onScroll={handleScrollToTop}
-            >
+            >{loading ? <div className="loading">loading</div> : ''}
                 {chats.map((chat) => {
                     const isCurrentUser = chat.user.id === currentUserId;
                     return (
@@ -315,8 +340,10 @@ const ChatComponent: React.FC = () => {
                     Send
                 </button>
             </div>
+
         </div>
     );
+
 };
 
 export default ChatComponent;

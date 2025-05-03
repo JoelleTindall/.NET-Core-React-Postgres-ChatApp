@@ -88,7 +88,7 @@ namespace ChatApplication.Server.Controllers
             {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim("userId", id),
-            new Claim("role", isAdmin),
+            new Claim("isAdmin", (isAdmin).ToLower()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
